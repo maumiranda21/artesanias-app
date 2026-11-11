@@ -12,12 +12,13 @@
         h1, h2, h3, h4 { line-height: 1.15 !important; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-transicion { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
     </style>
 </head>
 <body class="bg-stone-50 text-stone-900 min-h-screen">
 
     <!-- Header / Navegación -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50 transition-all">
+    <header class="bg-white/90 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="cambiarVista('catalogo')">
                 <span class="text-2xl">🏺</span>
@@ -37,12 +38,12 @@
         <section id="vista-catalogo" class="space-y-8 fade-in">
             <div class="text-center max-w-2xl mx-auto space-y-2">
                 <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900">Colección Artesanal</h2>
-                <p class="text-stone-600 text-sm sm:text-base">Piezas únicas hechas a mano con historia y tradición. Haz clic en "Quiero este" para comunicarte con nosotros.</p>
+                <p class="text-stone-600 text-sm sm:text-base">Piezas únicas hechas a mano con historia y tradición. Haz clic en "Quiero este" para copiar los datos y contactar por WhatsApp.</p>
             </div>
 
             <!-- Filtros de Categorías -->
             <div class="flex flex-wrap justify-center gap-2 py-2" id="filtros-categorias">
-                <button onclick="filtrarCategoria('todos')" class="px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider bg-stone-900 text-white shadow-sm transition">Todas</button>
+                <button onclick="filtrarCategoria('todos')" class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider bg-stone-900 text-white shadow-sm transition">Todas</button>
             </div>
 
             <!-- Grid de Productos -->
@@ -54,7 +55,7 @@
         <!-- VISTA: PANEL ADMINISTRATIVO PROTEGIDO -->
         <section id="vista-admin" class="hidden space-y-8 fade-in">
             <!-- Login -->
-            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
                 <div class="text-center space-y-1">
                     <h2 class="text-2xl font-bold tracking-tight text-stone-900">Acceso Administrador</h2>
                     <p class="text-sm text-stone-500">Ingresa tu correo y contraseña para gestionar el inventario.</p>
@@ -74,7 +75,7 @@
 
             <!-- Dashboard Admin -->
             <div id="admin-dashboard" class="hidden space-y-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 rounded-3xl border border-stone-200 shadow-sm gap-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 rounded-2xl border border-stone-200 shadow-sm gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-stone-900">Panel de Control</h2>
                         <p class="text-sm text-stone-500" id="admin-user-email">Administrador autenticado</p>
@@ -94,7 +95,7 @@
                         <h3 class="text-lg font-bold text-stone-900">Gestión de Inventario</h3>
                         <button onclick="abrirModalProducto()" class="px-4 py-2.5 bg-stone-900 text-white font-medium rounded-xl text-sm hover:bg-stone-800 transition shadow-sm">+ Nuevo Producto</button>
                     </div>
-                    <div class="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm">
+                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-stone-50 border-b border-stone-200 text-xs font-semibold uppercase tracking-wider text-stone-500">
@@ -112,14 +113,14 @@
 
                 <!-- IMPORTAR -->
                 <div id="panel-importar" class="hidden space-y-6">
-                    <div class="bg-white p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+                    <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
                         <h3 class="text-lg font-bold text-stone-900">Importación Masiva por Carpeta</h3>
-                        <p class="text-sm text-stone-600">Selecciona la carpeta principal de tu inventario que contenga subcarpetas por cada pieza de artesanía (ej. <code>Coleccion/Collar_Azul/foto1.jpg</code>).</p>
-                        <div class="border-2 border-dashed border-stone-300 rounded-3xl p-10 text-center space-y-4 hover:border-stone-400 transition cursor-pointer bg-stone-50/50" onclick="document.getElementById('input-folder').click()">
+                        <p class="text-sm text-stone-600">Para que funcione correctamente, debes seleccionar una carpeta principal (ej. <code>INVENTARIO_ARTESANIAS</code>) que en su interior contenga <strong>subcarpetas</strong> por cada producto (ej. <code>Collar_Azul</code>, <code>Aretes_Florales</code>), y dentro de esas subcarpetas estén las fotos.</p>
+                        <div class="border-2 border-dashed border-stone-300 rounded-2xl p-10 text-center space-y-4 hover:border-stone-400 transition cursor-pointer bg-stone-50/50" onclick="document.getElementById('input-folder').click()">
                             <span class="text-5xl">📁</span>
                             <div>
-                                <p class="font-semibold text-stone-900">Haz clic aquí para seleccionar la carpeta de artesanías</p>
-                                <p class="text-xs text-stone-500 mt-1">El sistema detectará automáticamente cada subcarpeta como un producto y sus fotos.</p>
+                                <p class="font-semibold text-stone-900">Haz clic aquí para seleccionar la carpeta principal</p>
+                                <p class="text-xs text-stone-500 mt-1">El sistema leerá cada subcarpeta como un producto independiente.</p>
                             </div>
                             <input type="file" id="input-folder" webkitdirectory directory multiple class="hidden" onchange="procesarCarpetaImportacion(event)">
                         </div>
@@ -132,7 +133,7 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-stone-900">Registro de Ventas</h3>
                     </div>
-                    <div class="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm">
+                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-stone-50 border-b border-stone-200 text-xs font-semibold uppercase tracking-wider text-stone-500">
@@ -150,9 +151,9 @@
         </section>
     </main>
 
-    <!-- MODAL PRODUCTO (Crear / Editar) -->
+    <!-- MODAL PRODUCTO -->
     <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-lg rounded-3xl p-8 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+        <div class="bg-white w-full max-w-lg rounded-2xl p-8 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
@@ -187,7 +188,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías (Puedes seleccionar varias)</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías (Selecciona una o varias)</label>
                     <input type="file" id="prod-fotos" multiple accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 transition">
                 </div>
                 <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
@@ -198,7 +199,15 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE LÓGICA -->
+    <!-- MODAL DE ZOOM PARA FOTOGRAFÍAS -->
+    <div id="modal-zoom" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
+        <div class="relative max-w-4xl max-h-[90vh]">
+            <img id="img-zoom-src" src="" class="max-w-full max-h-[85vh] rounded-xl object-contain shadow-2xl">
+            <button class="absolute top-4 right-4 bg-white/20 hover:bg-white/40 text-white text-xl w-10 h-10 rounded-full flex items-center justify-center transition">×</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
     <script>
         const SUPABASE_URL = 'https://mprojuxphdxyvghqoynv.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OVwdEUSZNt9en94i-g-Ulw_QuwLT901';
@@ -206,7 +215,7 @@
 
         let productosGlobal = [];
         let categoriaActual = 'todos';
-        let carruselIndices = {}; // Control de índices para múltiples fotos
+        let carruselIndices = {};
 
         document.addEventListener('DOMContentLoaded', () => {
             verificarSesionReal();
@@ -250,14 +259,14 @@
             if (vista === 'catalogo') {
                 document.getElementById('vista-catalogo').classList.remove('hidden');
                 document.getElementById('vista-admin').classList.add('hidden');
-                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition shadow-sm';
-                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
+                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-xl bg-stone-900 text-white transition shadow-sm';
+                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-xl text-stone-600 hover:bg-stone-100 transition';
                 cargarCatalogoPublico();
             } else {
                 document.getElementById('vista-catalogo').classList.add('hidden');
                 document.getElementById('vista-admin').classList.remove('hidden');
-                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition shadow-sm';
-                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
+                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-xl bg-stone-900 text-white transition shadow-sm';
+                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-xl text-stone-600 hover:bg-stone-100 transition';
                 verificarSesionReal();
             }
         }
@@ -282,7 +291,7 @@
             const categorias = ['todos', ...new Set(productosGlobal.map(p => p.category).filter(Boolean))];
             
             contenedor.innerHTML = categorias.map(cat => `
-                <button onclick="filtrarCategoria('${cat}')" class="px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition ${categoriaActual === cat ? 'bg-stone-900 text-white shadow-sm' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100'}">
+                <button onclick="filtrarCategoria('${cat}')" class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition ${categoriaActual === cat ? 'bg-stone-900 text-white shadow-sm' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100'}">
                     ${cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </button>
             `).join('');
@@ -304,7 +313,6 @@
             }
 
             grid.innerHTML = filtrados.map(p => {
-                // Asegurar array de imágenes
                 let fotos = [];
                 if (Array.isArray(p.images) && p.images.length > 0) {
                     fotos = p.images;
@@ -314,41 +322,36 @@
                     fotos = ['https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=800&q=80'];
                 }
 
-                if (carruselIndices[p.id] === undefined) {
-                    carruselIndices[p.id] = 0;
-                }
+                if (carruselIndices[p.id] === undefined) carruselIndices[p.id] = 0;
                 let idxActual = carruselIndices[p.id];
                 if (idxActual >= fotos.length) idxActual = 0;
 
-                const badgeEstado = p.status === 'vendido' ? '<span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Vendido</span>' : 
-                                    p.status === 'reservado' ? '<span class="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Reservado</span>' : '';
+                const badgeEstado = p.status === 'vendido' ? '<span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-sm">Vendido</span>' : 
+                                    p.status === 'reservado' ? '<span class="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-sm">Reservado</span>' : '';
 
-                // Enlace personalizado para WhatsApp ("Quiero este")
-                const mensajeWhatsApp = encodeURIComponent(`Hola, quiero este producto: "${p.name}", precio: $${Number(p.price).toFixed(2)}. ¿Está disponible?`);
-                const enlaceWsp = `https://wa.me/?text=${mensajeWhatsApp}`;
-
-                // Botones de carrusel si hay más de 1 foto
                 let controlesCarrusel = '';
                 if (fotos.length > 1) {
                     controlesCarrusel = `
                         <button onclick="cambiarFoto('${p.id}', -1, event)" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition shadow-md">‹</button>
                         <button onclick="cambiarFoto('${p.id}', 1, event)" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition shadow-md">›</button>
-                        <div class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-medium px-2.5 py-1 rounded-full backdrop-blur-sm">
+                        <div class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-medium px-2.5 py-1 rounded-md backdrop-blur-sm">
                             ${idxActual + 1} / ${fotos.length}
                         </div>
                     `;
                 }
 
                 return `
-                    <div class="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col group">
-                        <!-- Contenedor Fotográfico con gran protagonismo -->
-                        <div class="relative h-80 sm:h-96 bg-stone-100 overflow-hidden">
-                            <img src="${fotos[idxActual]}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col group">
+                        <div class="relative h-96 sm:h-[420px] bg-stone-100 overflow-hidden cursor-pointer" onclick="abrirZoom('${fotos[idxActual]}')">
+                            <img src="${fotos[idxActual]}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 slide-transicion">
                             ${badgeEstado}
                             ${controlesCarrusel}
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-end justify-center pb-4">
+                                <span class="bg-white/90 backdrop-blur-sm text-stone-900 text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm opacity-0 group-hover:opacity-100 transition">🔍 Ver detalle</span>
+                            </div>
                         </div>
                         <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
-                            <div class="space-y-1.5">
+                            <div class="space-y-1">
                                 <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">${p.category || 'General'}</span>
                                 <h3 class="text-xl font-bold text-stone-900 tracking-tight">${p.name}</h3>
                                 <p class="text-sm text-stone-600 line-clamp-2 leading-relaxed">${p.description || 'Pieza artesanal única elaborada a mano.'}</p>
@@ -356,11 +359,10 @@
                             <div class="space-y-3 pt-4 border-t border-stone-100">
                                 <div class="flex items-center justify-between">
                                     <span class="text-2xl font-extrabold text-stone-900">$ ${Number(p.price).toFixed(2)}</span>
-                                    <button onclick="copiarEnlaceProducto('${p.name}')" class="text-xs font-semibold text-stone-500 hover:text-stone-900 px-3 py-1.5 rounded-lg border border-stone-200 hover:bg-stone-50 transition">Copiar enlace</button>
                                 </div>
-                                <a href="${enlaceWsp}" target="_blank" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-2xl transition flex items-center justify-center space-x-2 shadow-sm">
+                                <button onclick="accionQuieroEste('${p.name}', '${p.price}', '${p.category}', '${(p.description || '').replace(/'/g, "\\'")}')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center space-x-2 shadow-sm">
                                     <span>Quiero este</span>
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -383,10 +385,29 @@
             renderizarProductos();
         }
 
-        function copiarEnlaceProducto(nombre) {
-            const urlActual = window.location.href.split('#')[0];
-            navigator.clipboard.writeText(urlActual);
-            alert(`¡Enlace del producto "${nombre}" copiado al portapapeles! Ya puedes compartirlo.`);
+        function abrirZoom(urlImg) {
+            document.getElementById('img-zoom-src').src = urlImg;
+            document.getElementById('modal-zoom').classList.remove('hidden');
+            document.getElementById('modal-zoom').classList.add('flex');
+        }
+
+        function cerrarZoom() {
+            document.getElementById('modal-zoom').classList.add('hidden');
+            document.getElementById('modal-zoom').classList.remove('flex');
+        }
+
+        function accionQuieroEste(nombre, precio, categoria, desc) {
+            const textoPedido = `Hola, quiero este producto:\n- *${nombre}*\n- Categoría: ${categoria}\n- Precio: $${Number(precio).toFixed(2)}\n- Descripción: ${desc}\n\n¿Está disponible?`;
+            
+            // Copiar al portapapeles
+            navigator.clipboard.writeText(textoPedido).then(() => {
+                alert(`¡Información copiada al portapapeles!\nSe abrirá WhatsApp para que envíes el mensaje a tu asesora.`);
+                const urlWsp = `https://wa.me/?text=${encodeURIComponent(textoPedido)}`;
+                window.open(urlWsp, '_blank');
+            }).catch(() => {
+                const urlWsp = `https://wa.me/?text=${encodeURIComponent(textoPedido)}`;
+                window.open(urlWsp, '_blank');
+            });
         }
 
         // Administración y Pestañas
@@ -466,7 +487,6 @@
             document.getElementById('modal-producto').classList.remove('flex');
         }
 
-        // GUARDAR PRODUCTO CON PREVENCIÓN DE DOBLE CLIC Y SOPORTE MULTI-FOTO
         async function guardarProducto(e) {
             e.preventDefault();
             const btnGuardar = document.getElementById('btn-guardar-prod');
@@ -495,8 +515,6 @@
             }
 
             const productoData = { name, category, price, collection_name, description, status };
-            
-            // Si subió nuevas fotos, actualizamos el array de imágenes
             if (imageUrls.length > 0) {
                 productoData.images = imageUrls;
                 productoData.main_image = imageUrls[0];
@@ -504,7 +522,6 @@
 
             let error;
             if (id) {
-                // Si estamos editando y no se seleccionaron nuevas fotos, mantenemos las anteriores
                 if (imageUrls.length === 0) {
                     delete productoData.images;
                     delete productoData.main_image;
@@ -559,7 +576,6 @@
             }
         }
 
-        // IMPORTACIÓN MASIVA CORREGIDA Y FUNCIONAL
         let carpetaDatosGlobal = {};
 
         async function procesarCarpetaImportacion(e) {
@@ -571,7 +587,7 @@
             for (let file of files) {
                 const pathParts = file.webkitRelativePath.split('/');
                 if (pathParts.length > 2) {
-                    const nombreCarpeta = pathParts[1]; // Nombre del producto según la subcarpeta
+                    const nombreCarpeta = pathParts[1];
                     if (!carpetaDatosGlobal[nombreCarpeta]) {
                         carpetaDatosGlobal[nombreCarpeta] = [];
                     }
@@ -588,7 +604,7 @@
             let html = `<div class="space-y-4"><h4 class="font-bold text-stone-900">Se detectaron ${nombresProd.length} productos listos para importar:</h4><div class="space-y-2 max-h-60 overflow-y-auto pr-2">`;
             for (let [nombreProd, fotos] of Object.entries(carpetaDatosGlobal)) {
                 html += `
-                    <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 flex justify-between items-center">
+                    <div class="p-4 bg-stone-50 rounded-xl border border-stone-200 flex justify-between items-center">
                         <div>
                             <p class="font-semibold text-stone-900">${nombreProd.replace(/_/g, ' ')}</p>
                             <p class="text-xs text-stone-500">${fotos.length} fotografías asociadas</p>
@@ -621,10 +637,10 @@
                 }
 
                 if (imageUrls.length > 0) {
-                    await supabaseClient.from('products').insert([{
+                    await supabaseClient.from('products'].insert([{
                         name: nombreLimpio,
                         category: 'General',
-                        price: 0.00, // Precio por defecto para que lo edites luego
+                        price: 0.00,
                         description: 'Pieza importada automáticamente desde carpeta.',
                         status: 'disponible',
                         images: imageUrls,
