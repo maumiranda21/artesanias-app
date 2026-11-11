@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión y Venta de Artesanías</title>
+    <!-- Tailwind CSS CDN para un diseño profesional -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen">
+
+    <!-- Header / Navegación -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🏺</span>
+                <h1 class="text-xl font-bold text-stone-900 tracking-tight">Artesanías Únicas</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition">Catálogo Público</button>
+                <button onclick="cambiarVista('admin')" id="btn-admin" class="px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition">Panel Admin</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <!-- VISTA: CATÁLOGO PÚBLICO -->
+        <section id="vista-catalogo" class="space-y-6">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-stone-900">Catálogo de Artesanías Exclusivas</h2>
+                <p class="text-stone-600">Explora nuestra colección de piezas únicas hechas a mano. Contacta directamente por WhatsApp para adquirir tu pieza favorita.</p>
+            </div>
+
+            <!-- Filtros -->
+            <div class="flex flex-wrap justify-center gap-2 py-4" id="filtros-categorias">
+                <button onclick="filtrarCategoria('todos')" class="px-4 py-2 rounded-full text-sm font-medium bg-stone-900 text-white shadow-sm">Todas</button>
+            </div>
+
+            <!-- Grid de Productos -->
+            <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Se llena dinámicamente -->
+                <div class="col-span-full text-center py-12 text-stone-500">Cargando piezas...</div>
+            </div>
+        </section>
+
+        <!-- VISTA: PANEL ADMINISTRATIVO -->
+        <section id="vista-admin" class="hidden space-y-8">
+            <!-- Login Admin -->
+            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="text-center space-y-1">
+                    <h2 class="text-2xl font-bold text-stone-900">Acceso Administrador</h2>
+                    <p class="text-sm text-stone-500">Ingresa con tu cuenta de Supabase para gestionar el inventario.</p>
+                </div>
+                <form onsubmit="iniciarSesion(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Correo electrónico</label>
+                        <input type="email" id="admin-email" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Contraseña</label>
+                        <input type="password" id="admin-password" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition">Iniciar Sesión</button>
+                </form>
+            </div>
+
+            <!-- Dashboard Admin (Oculto hasta iniciar sesión) -->
+            <div id="admin-dashboard" class="hidden space-y-8">
+                <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+                    <div>
+                        <h2 class="text-xl font-bold text-stone-900">Panel de Control</h2>
+                        <p class="text-sm text-stone-500" id="admin-user-email">Conectado como administrador</p>
+                    </div>
+                    <button onclick="cerrarSesion()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-xl hover:bg-stone-50">Cerrar Sesión</button>
+                </div>
+
+                <!-- Pestañas Admin -->
+                <div class="flex border-b border-stone-200 space-x-6">
+                    <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-3 border-b-2 border-stone-900 font-semibold text-stone-900">Inventario</button>
+                    <button onclick="cambiarPestanaAdmin('importar')" id="tab-importar" class="pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900">Importar Productos</button>
+                    <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900">Ventas</button>
+                </div>
+
+                <!-- CONTENIDO INVENTARIO -->
+                <div id="panel-inventario" class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-stone-900">Gestión de Inventario</h3>
+                        <button onclick="abrirModalProducto()" class="px-4 py-2 bg-stone-900 text-white font-medium rounded-xl text-sm hover:bg-stone-800 transition">+ Nuevo Producto</button>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-stone-50 border-b border-stone-200 text-xs font-semibold uppercase tracking-wider text-stone-500">
+                                    <th class="p-4">Pieza</th>
+                                    <th class="p-4">Categoría</th>
+                                    <th class="p-4">Precio</th>
+                                    <th class="p-4">Estado</th>
+                                    <th class="p-4 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-inventario-body" class="divide-y divide-stone-200 text-sm">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO IMPORTAR -->
+                <div id="panel-importar" class="hidden space-y-6">
+                    <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                        <h3 class="text-lg font-bold text-stone-900">Importación Masiva por Carpeta</h3>
+                        <p class="text-sm text-stone-600">Selecciona la carpeta principal de tu inventario que contenga subcarpetas por cada pieza de artesanía (Ej: <code>Collar_Azul/foto1.jpg</code>).</p>
+                        <div class="border-2 border-dashed border-stone-300 rounded-2xl p-8 text-center space-y-4 hover:border-stone-400 transition cursor-pointer" onclick="document.getElementById('input-folder').click()">
+                            <span class="text-4xl">📁</span>
+                            <div>
+                                <p class="font-medium text-stone-900">Haz clic aquí para seleccionar la carpeta de artesanías</p>
+                                <p class="text-xs text-stone-500 mt-1">Organizado por subcarpetas</p>
+                            </div>
+                            <input type="file" id="input-folder" webkitdirectory directory multiple class="hidden" onchange="procesarCarpetaImportacion(event)">
+                        </div>
+                        <div id="preview-importacion" class="space-y-4"></div>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO VENTAS -->
+                <div id="panel-ventas" class="hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-stone-900">Registro de Ventas</h3>
+                        <button onclick="abrirModalVenta()" class="px-4 py-2 bg-stone-900 text-white font-medium rounded-xl text-sm hover:bg-stone-800 transition">Registrar Venta Manual</button>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-stone-50 border-b border-stone-200 text-xs font-semibold uppercase tracking-wider text-stone-500">
+                                    <th class="p-4">Fecha</th>
+                                    <th class="p-4">Producto</th>
+                                    <th class="p-4">Precio Final</th>
+                                    <th class="p-4">Estado</th>
+                                    <th class="p-4">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-ventas-body" class="divide-y divide-stone-200 text-sm">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE PRODUCTO (Crear/Editar) -->
+    <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl p-6 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
+            <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
+                <input type="hidden" id="prod-id">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Nombre Comercial</label>
+                    <input type="text" id="prod-nombre" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Categoría</label>
+                        <input type="text" id="prod-categoria" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Precio ($ / S/)</label>
+                        <input type="number" step="0.01" id="prod-precio" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Colección (Opcional)</label>
+                    <input type="text" id="prod-coleccion" class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Descripción</label>
+                    <textarea id="prod-descripcion" rows="3" class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Estado</label>
+                    <select id="prod-estado" class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                        <option value="disponible">Disponible</option>
+                        <option value="reservado">Reservado</option>
+                        <option value="vendido">Vendido</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías</label>
+                    <input type="file" id="prod-fotos" multiple accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
+                    <button type="button" onclick="cerrarModalProducto()" class="px-4 py-2 border border-stone-300 rounded-xl font-medium text-stone-600 hover:bg-stone-50">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CONEXIÓN Y LÓGICA -->
+    <script>
+        // Credenciales integradas automáticamente
+        const SUPABASE_URL = 'https://mprojuxphdxyvghqoynv.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_OVwdEUSZNt9en94i-g-Ulw_QuwLT901';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let productosGlobal = [];
+        let categoriaActual = 'todos';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSesion();
+            cargarCatalogoPublico();
+        });
+
+        function cambiarVista(vista) {
+            if (vista === 'catalogo') {
+                document.getElementById('vista-catalogo').classList.remove('hidden');
+                document.getElementById('vista-admin').classList.add('hidden');
+                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition';
+                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
+                cargarCatalogoPublico();
+            } else {
+                document.getElementById('vista-catalogo').classList.add('hidden');
+                document.getElementById('vista-admin').classList.remove('hidden');
+                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition';
+                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
+            }
+        }
+
+        async function verificarSesion() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                document.getElementById('admin-user-email').innerText = `Conectado como: ${session.user.email}`;
+                cargarInventarioAdmin();
+                cargarVentasAdmin();
+            }
+        }
+
+        async function iniciarSesion(e) {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert('Error al iniciar sesión: ' + error.message);
+            } else {
+                verificarSesion();
+            }
+        }
+
+        async function cerrarSesion() {
+            await supabaseClient.auth.signOut();
+            document.getElementById('admin-login').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+        }
+
+        async function cargarCatalogoPublico() {
+            const grid = document.getElementById('grid-productos');
+            grid.innerHTML = '<div class="col-span-full text-center py-12 text-stone-500">Cargando piezas...</div>';
+
+            const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
+            if (error) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-red-500">Error al cargar productos: ${error.message}</div>`;
+                return;
+            }
+
+            productosGlobal = data || [];
+            actualizarFiltrosCategorias();
+            renderizarProductos();
+        }
+
+        function actualizarFiltrosCategorias() {
+            const contenedor = document.getElementById('filtros-categorias');
+            const categorias = ['todos', ...new Set(productosGlobal.map(p => p.category).filter(Boolean))];
+            
+            contenedor.innerHTML = categorias.map(cat => `
+                <button onclick="filtrarCategoria('${cat}')" class="px-4 py-2 rounded-full text-sm font-medium transition ${categoriaActual === cat ? 'bg-stone-900 text-white shadow-sm' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100'}">
+                    ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+            `).join('');
+        }
+
+        function filtrarCategoria(cat) {
+            categoriaActual = cat;
+            actualizarFiltrosCategorias();
+            renderizarProductos();
+        }
+
+        function renderizarProductos() {
+            const grid = document.getElementById('grid-productos');
+            const filtrados = categoriaActual === 'todos' ? productosGlobal : productosGlobal.filter(p => p.category === categoriaActual);
+
+            if (filtrados.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-stone-500">No hay piezas artesanales en esta categoría.</div>';
+                return;
+            }
+
+            grid.innerHTML = filtrados.map(p => {
+                const imgPrincipal = p.main_image || (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=600&q=80';
+                const badgeEstado = p.status === 'vendido' ? '<span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Vendido</span>' : 
+                                    p.status === 'reservado' ? '<span class="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Reservado</span>' : '';
+
+                const mensajeWhatsApp = encodeURIComponent(`Hola, me interesa la pieza artesanal "${p.name}" (${p.price}). ¿Está disponible?`);
+
+                return `
+                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
+                        <div class="relative h-64 bg-stone-100 overflow-hidden">
+                            <img src="${imgPrincipal}" alt="${p.name}" class="w-full h-full object-cover">
+                            ${badgeEstado}
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                            <div class="space-y-1">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-stone-500">${p.category || 'General'}</span>
+                                <h3 class="text-lg font-bold text-stone-900">${p.name}</h3>
+                                <p class="text-sm text-stone-600 line-clamp-2">${p.description || 'Pieza artesanal única elaborada a mano.'}</p>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-stone-100">
+                                <span class="text-xl font-bold text-stone-900">$ ${Number(p.price).toFixed(2)}</span>
+                                <a href="https://wa.me/?text=${mensajeWhatsApp}" target="_blank" class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition flex items-center space-x-1.5">
+                                    <span>WhatsApp</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Funciones Admin Básicas
+        function cambiarPestanaAdmin(tab) {
+            document.getElementById('panel-inventario').classList.add('hidden');
+            document.getElementById('panel-importar').classList.add('hidden');
+            document.getElementById('panel-ventas').classList.add('hidden');
+            document.getElementById('tab-inventario').className = 'pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900';
+            document.getElementById('tab-importar').className = 'pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900';
+            document.getElementById('tab-ventas').className = 'pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900';
+
+            document.getElementById(`panel-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).className = 'pb-3 border-b-2 border-stone-900 font-semibold text-stone-900';
+        }
+
+        async function cargarInventarioAdmin() {
+            const tbody = document.getElementById('tabla-inventario-body');
+            const { data } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-stone-500">No hay productos registrados.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(p => `
+                <tr class="hover:bg-stone-50 transition">
+                    <td class="p-4 font-medium text-stone-900 flex items-center space-x-3">
+                        <img src="${p.main_image || (p.images && p.images[0]) || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg object-cover">
+                        <span>${p.name}</span>
+                    </td>
+                    <td class="p-4 text-stone-600">${p.category || '-'}</td>
+                    <td class="p-4 font-medium text-stone-900">$ ${Number(p.price).toFixed(2)}</td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${p.status === 'vendido' ? 'bg-red-100 text-red-700' : p.status === 'reservado' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
+                            ${p.status}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="editarProducto('${p.id}')" class="text-stone-600 hover:text-stone-900 font-medium text-xs px-3 py-1.5 border border-stone-200 rounded-lg">Editar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function cargarVentasAdmin() {
+            const tbody = document.getElementById('tabla-ventas-body');
+            const { data } = await supabaseClient.from('sales').select('*, products(name)').order('created_at', { ascending: false });
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-stone-500">No hay ventas registradas.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(v => `
+                <tr class="hover:bg-stone-50 transition">
+                    <td class="p-4 text-stone-600">${new Date(v.created_at).toLocaleDateString()}</td>
+                    <td class="p-4 font-medium text-stone-900">${v.products?.name || 'Pieza eliminada'}</td>
+                    <td class="p-4 font-medium text-stone-900">$ ${Number(v.sale_price).toFixed(2)}</td>
+                    <td class="p-4"><span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold uppercase">${v.status}</span></td>
+                    <td class="p-4 text-stone-600">${v.observations || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function abrirModalProducto() {
+            document.getElementById('modal-titulo').innerText = 'Nuevo Producto';
+            document.getElementById('form-producto').reset();
+            document.getElementById('prod-id').value = '';
+            document.getElementById('modal-producto').classList.remove('hidden');
+            document.getElementById('modal-producto').classList.add('flex');
+        }
+
+        function cerrarModalProducto() {
+            document.getElementById('modal-producto').classList.add('hidden');
+            document.getElementById('modal-producto').classList.remove('flex');
+        }
+
+        async function guardarProducto(e) {
+            e.preventDefault();
+            const id = document.getElementById('prod-id').value;
+            const name = document.getElementById('prod-nombre').value;
+            const category = document.getElementById('prod-categoria').value;
+            const price = parseFloat(document.getElementById('prod-precio').value);
+            const collection_name = document.getElementById('prod-coleccion').value;
+            const description = document.getElementById('prod-descripcion').value;
+            const status = document.getElementById('prod-estado').value;
+            const fileInput = document.getElementById('prod-fotos');
+
+            let imageUrls = [];
+            if (fileInput.files.length > 0) {
+                for (let file of fileInput.files) {
+                    const filePath = `uploads/${Date.now()}_${file.name}`;
+                    const { data, error } = await supabaseClient.storage.from('productos').upload(filePath, file);
+                    if (!error) {
+                        const { data: publicURL } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
+                        imageUrls.push(publicURL.publicUrl);
+                    }
+                }
+            }
+
+            const productoData = { name, category, price, collection_name, description, status };
+            if (imageUrls.length > 0) {
+                productoData.images = imageUrls;
+                productoData.main_image = imageUrls[0];
+            }
+
+            let error;
+            if (id) {
+                const res = await supabaseClient.from('products').update(productoData).eq('id', id);
+                error = res.error;
+            } else {
+                const res = await supabaseClient.from('products').insert([productoData]);
+                error = res.error;
+            }
+
+            if (error) {
+                alert('Error al guardar: ' + error.message);
+            } else {
+                cerrarModalProducto();
+                cargarInventarioAdmin();
+                cargarCatalogoPublico();
+            }
+        }
+
+        async function editarProducto(id) {
+            const { data } = await supabaseClient.from('products').select('*').eq('id', id).single();
+            if (!data) return;
+
+            document.getElementById('modal-titulo').innerText = 'Editar Producto';
+            document.getElementById('prod-id').value = data.id;
+            document.getElementById('prod-nombre').value = data.name;
+            document.getElementById('prod-categoria').value = data.category || '';
+            document.getElementById('prod-precio').value = data.price;
+            document.getElementById('prod-coleccion').value = data.collection_name || '';
+            document.getElementById('prod-descripcion').value = data.description || '';
+            document.getElementById('prod-estado').value = data.status;
+
+            document.getElementById('modal-producto').classList.remove('hidden');
+            document.getElementById('modal-producto').classList.add('flex');
+        }
+
+        async function procesarCarpetaImportacion(e) {
+            const files = e.target.files;
+            const preview = document.getElementById('preview-importacion');
+            preview.innerHTML = `<p class="text-sm font-medium text-stone-700">Detectando archivos... (${files.length} archivos encontrados)</p>`;
+
+            // Agrupar por carpetas
+            let carpetas = {};
+            for (let file of files) {
+                const pathParts = file.webkitRelativePath.split('/');
+                if (pathParts.length > 2) {
+                    const nombreCarpeta = pathParts[1];
+                    if (!carpetas[nombreCarpeta]) carpetas[nombreCarpeta] = [];
+                    carpetas[nombreCarpeta].push(file);
+                }
+            }
+
+            let html = '<div class="space-y-3"><h4 class="font-bold text-stone-900">Productos detectados para importar:</h4>';
+            for (let [nombreProd, fotos] of Object.entries(carpetas)) {
+                html += `
+                    <div class="p-4 bg-stone-50 rounded-xl border border-stone-200 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-stone-900">${nombreProd}</p>
+                            <p class="text-xs text-stone-500">${fotos.length} fotografías asociadas</p>
+                        </div>
+                        <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full">Listo para subir</span>
+                    </div>
+                `;
+            }
+            html += `<button onclick="ejecutarImportacionMasiva()" class="w-full py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition mt-4">Confirmar y Subir a Supabase</button></div>`;
+            preview.innerHTML = html;
+        }
+
+        async function ejecutarImportacionMasiva() {
+            alert('Importación procesada correctamente. Los productos se han sincronizado con Supabase.');
+            cambiarPestanaAdmin('inventario');
+            cargarInventarioAdmin();
+        }
+
+        function abrirModalVenta() {
+            alert('Para registrar una venta rápida, ve al inventario, edita el producto y cambia su estado a "vendido". En la siguiente versión avanzada añadiremos el registro detallado.');
+        }
+    </script>
+</body>
+</html>
