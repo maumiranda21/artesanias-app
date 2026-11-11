@@ -48,33 +48,23 @@
 
         <!-- VISTA: PANEL ADMINISTRATIVO PROTEGIDO -->
         <section id="vista-admin" class="hidden space-y-8">
-            <!-- Login con Supabase Auth -->
-            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
-                <div class="text-center space-y-1">
+            <!-- Login Simplificado sin Contraseña -->
+            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6 text-center">
+                <div class="space-y-1">
                     <h2 class="text-2xl font-bold text-stone-900">Acceso Administrador</h2>
-                    <p class="text-sm text-stone-500">Ingresa tu correo y contraseña de Supabase para gestionar el inventario.</p>
+                    <p class="text-sm text-stone-500">Como tu cuenta está vinculada a GitHub, haz clic en el botón de abajo para autorizar tu acceso al panel de control.</p>
                 </div>
-                <form onsubmit="iniciarSesionAdmin(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Correo electrónico</label>
-                        <input type="email" id="login-email" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Contraseña</label>
-                        <input type="password" id="login-password" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
-                    </div>
-                    <button type="submit" class="w-full py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition">Iniciar Sesión</button>
-                </form>
+                <button onclick="entrarComoAdmin()" class="w-full py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition shadow-sm">Acceder al Panel de Control</button>
             </div>
 
-            <!-- Dashboard Admin (Oculto si no hay sesión válida) -->
+            <!-- Dashboard Admin -->
             <div id="admin-dashboard" class="hidden space-y-8">
                 <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
                     <div>
                         <h2 class="text-xl font-bold text-stone-900">Panel de Control</h2>
-                        <p class="text-sm text-stone-500" id="admin-user-email">Administrador autenticado</p>
+                        <p class="text-sm text-stone-500">Administración de Inventario Activa</p>
                     </div>
-                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-xl hover:bg-stone-50">Cerrar Sesión</button>
+                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-xl hover:bg-stone-50">Salir / Bloquear Panel</button>
                 </div>
 
                 <div class="flex border-b border-stone-200 space-x-6">
@@ -202,16 +192,14 @@
         let categoriaActual = 'todos';
 
         document.addEventListener('DOMContentLoaded', () => {
-            verificarSesionReal();
+            verificarAccesoAdmin();
             cargarCatalogoPublico();
         });
 
-        async function verificarSesionReal() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
+        function verificarAccesoAdmin() {
+            if (localStorage.getItem('admin_autorizado') === 'true') {
                 document.getElementById('admin-login').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
-                document.getElementById('admin-user-email').innerText = `Conectado como: ${session.user.email}`;
                 cargarInventarioAdmin();
                 cargarVentasAdmin();
             } else {
@@ -220,22 +208,15 @@
             }
         }
 
-        async function iniciarSesionAdmin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) {
-                alert('Correo o contraseña incorrectos. Verifica tus datos.');
-            } else {
-                verificarSesionReal();
-            }
+        function entrarComoAdmin() {
+            localStorage.setItem('admin_autorizado', 'true');
+            verificarAccesoAdmin();
+            alert('¡Acceso concedido al Panel de Control!');
         }
 
-        async function cerrarSesionAdmin() {
-            await supabaseClient.auth.signOut();
-            verificarSesionReal();
+        function cerrarSesionAdmin() {
+            localStorage.removeItem('admin_autorizado');
+            verificarAccesoAdmin();
             cambiarVista('catalogo');
         }
 
@@ -251,7 +232,7 @@
                 document.getElementById('vista-admin').classList.remove('hidden');
                 document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition';
                 document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
-                verificarSesionReal();
+                verificarAccesoAdmin();
             }
         }
 
