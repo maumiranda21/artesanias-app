@@ -85,7 +85,6 @@
 
                 <div class="flex border-b border-stone-200 space-x-6">
                     <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-3 border-b-2 border-stone-900 font-semibold text-stone-900 transition">Inventario</button>
-                    <button onclick="cambiarPestanaAdmin('importar')" id="tab-importar" class="pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900 transition">Importación Masiva</button>
                     <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900 transition">Ventas</button>
                 </div>
 
@@ -108,23 +107,6 @@
                             </thead>
                             <tbody id="tabla-inventario-body" class="divide-y divide-stone-200 text-sm"></tbody>
                         </table>
-                    </div>
-                </div>
-
-                <!-- IMPORTAR -->
-                <div id="panel-importar" class="hidden space-y-6">
-                    <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
-                        <h3 class="text-lg font-bold text-stone-900">Importación Masiva por Carpeta</h3>
-                        <p class="text-sm text-stone-600">Para que funcione correctamente, debes seleccionar una carpeta principal (ej. <code>INVENTARIO_ARTESANIAS</code>) que en su interior contenga <strong>subcarpetas</strong> por cada producto (ej. <code>Collar_Azul</code>, <code>Aretes_Florales</code>), y dentro de esas subcarpetas estén las fotos.</p>
-                        <div class="border-2 border-dashed border-stone-300 rounded-2xl p-10 text-center space-y-4 hover:border-stone-400 transition cursor-pointer bg-stone-50/50" onclick="document.getElementById('input-folder').click()">
-                            <span class="text-5xl">📁</span>
-                            <div>
-                                <p class="font-semibold text-stone-900">Haz clic aquí para seleccionar la carpeta principal</p>
-                                <p class="text-xs text-stone-500 mt-1">El sistema leerá cada subcarpeta como un producto independiente.</p>
-                            </div>
-                            <input type="file" id="input-folder" webkitdirectory directory multiple class="hidden" onchange="procesarCarpetaImportacion(event)">
-                        </div>
-                        <div id="preview-importacion" class="space-y-4"></div>
                     </div>
                 </div>
 
@@ -399,7 +381,6 @@
         function accionQuieroEste(nombre, precio, categoria, desc) {
             const textoPedido = `Hola, quiero este producto:\n- *${nombre}*\n- Categoría: ${categoria}\n- Precio: $${Number(precio).toFixed(2)}\n- Descripción: ${desc}\n\n¿Está disponible?`;
             
-            // Copiar al portapapeles
             navigator.clipboard.writeText(textoPedido).then(() => {
                 alert(`¡Información copiada al portapapeles!\nSe abrirá WhatsApp para que envíes el mensaje a tu asesora.`);
                 const urlWsp = `https://wa.me/?text=${encodeURIComponent(textoPedido)}`;
@@ -413,10 +394,8 @@
         // Administración y Pestañas
         function cambiarPestanaAdmin(tab) {
             document.getElementById('panel-inventario').classList.add('hidden');
-            document.getElementById('panel-importar').classList.add('hidden');
             document.getElementById('panel-ventas').classList.add('hidden');
             document.getElementById('tab-inventario').className = 'pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900 transition';
-            document.getElementById('tab-importar').className = 'pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900 transition';
             document.getElementById('tab-ventas').className = 'pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900 transition';
 
             document.getElementById(`panel-${tab}`).classList.remove('hidden');
@@ -508,7 +487,7 @@
                     const filePath = `uploads/${Date.now()}_${Math.random().toString(36).substring(2)}_${file.name}`;
                     const { data, error } = await supabaseClient.storage.from('productos').upload(filePath, file);
                     if (!error) {
-                        const { data: publicURL } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
+                        const { data: publicURL } = await supabaseClient.storage.from('productos').getPublicUrl(filePath);
                         imageUrls.push(publicURL.publicUrl);
                     }
                 }
@@ -574,86 +553,6 @@
                     cargarCatalogoPublico();
                 }
             }
-        }
-
-        let carpetaDatosGlobal = {};
-
-        async function procesarCarpetaImportacion(e) {
-            const files = e.target.files;
-            const preview = document.getElementById('preview-importacion');
-            preview.innerHTML = `<p class="text-sm font-medium text-stone-600">Analizando archivos (${files.length} archivos)...</p>`;
-
-            carpetaDatosGlobal = {};
-            for (let file of files) {
-                const pathParts = file.webkitRelativePath.split('/');
-                if (pathParts.length > 2) {
-                    const nombreCarpeta = pathParts[1];
-                    if (!carpetaDatosGlobal[nombreCarpeta]) {
-                        carpetaDatosGlobal[nombreCarpeta] = [];
-                    }
-                    carpetaDatosGlobal[nombreCarpeta].push(file);
-                }
-            }
-
-            const nombresProd = Object.keys(carpetaDatosGlobal);
-            if (nombresProd.length === 0) {
-                preview.innerHTML = `<p class="text-sm text-red-500">No se detectaron subcarpetas válidas. Asegúrate de seleccionar la carpeta principal que contenga subcarpetas por cada pieza.</p>`;
-                return;
-            }
-
-            let html = `<div class="space-y-4"><h4 class="font-bold text-stone-900">Se detectaron ${nombresProd.length} productos listos para importar:</h4><div class="space-y-2 max-h-60 overflow-y-auto pr-2">`;
-            for (let [nombreProd, fotos] of Object.entries(carpetaDatosGlobal)) {
-                html += `
-                    <div class="p-4 bg-stone-50 rounded-xl border border-stone-200 flex justify-between items-center">
-                        <div>
-                            <p class="font-semibold text-stone-900">${nombreProd.replace(/_/g, ' ')}</p>
-                            <p class="text-xs text-stone-500">${fotos.length} fotografías asociadas</p>
-                        </div>
-                        <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full">Detectado</span>
-                    </div>
-                `;
-            }
-            html += `</div><button onclick="ejecutarImportacionMasivaReal()" id="btn-ejecutar-import" class="w-full py-3.5 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition shadow-sm">Confirmar e Importar a Supabase</button></div>`;
-            preview.innerHTML = html;
-        }
-
-        async function ejecutarImportacionMasivaReal() {
-            const btnImp = document.getElementById('btn-ejecutar-import');
-            btnImp.disabled = true;
-            btnImp.innerText = 'Subiendo archivos a Supabase...';
-
-            let contador = 0;
-            for (let [nombreCarpeta, fotos] of Object.entries(carpetaDatosGlobal)) {
-                const nombreLimpio = nombreCarpeta.replace(/_/g, ' ');
-                let imageUrls = [];
-
-                for (let file of fotos) {
-                    const filePath = `uploads/${Date.now()}_${Math.random().toString(36).substring(2)}_${file.name}`;
-                    const { data, error } = await supabaseClient.storage.from('productos').upload(filePath, file);
-                    if (!error) {
-                        const { data: publicURL } = await supabaseClient.storage.from('productos').getPublicUrl(filePath);
-                        imageUrls.push(publicURL.publicUrl);
-                    }
-                }
-
-                if (imageUrls.length > 0) {
-                    await supabaseClient.from('products'].insert([{
-                        name: nombreLimpio,
-                        category: 'General',
-                        price: 0.00,
-                        description: 'Pieza importada automáticamente desde carpeta.',
-                        status: 'disponible',
-                        images: imageUrls,
-                        main_image: imageUrls[0]
-                    }]);
-                    contador++;
-                }
-            }
-
-            alert(`¡Importación exitosa! Se han creado ${contador} nuevos productos en tu base de datos.`);
-            cambiarPestanaAdmin('inventario');
-            cargarInventarioAdmin();
-            cargarCatalogoPublico();
         }
     </script>
 </body>
