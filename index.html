@@ -26,7 +26,7 @@
                 <button onclick="cambiarVista('admin')" id="btn-admin" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-stone-600 hover:bg-stone-100 transition">Admin</button>
             </div>
 
-            <!-- Logotipo Centrado y más grande -->
+            <!-- Logotipo Centrado -->
             <div class="cursor-pointer flex justify-center" onclick="cambiarVista('catalogo')">
                 <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-12 sm:h-14 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
             </div>
@@ -130,16 +130,16 @@
         </section>
     </main>
 
-    <!-- MODAL PRODUCTO CON AUTOCOMPLETADO IA -->
+    <!-- MODAL PRODUCTO CON IA BASADA EN NOMBRE DE ARCHIVO -->
     <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-lg rounded-lg p-8 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías (La IA autocompletará nombre y descripción)</label>
-                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="analizarImagenConIA(event)" class="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 transition">
-                    <p id="ia-estado" class="text-xs text-stone-400 mt-1.5 hidden">✨ Analizando la pieza artesanal con IA...</p>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías (La IA leerá el nombre del archivo)</label>
+                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="analizarNombreArchivoIA(event)" class="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 transition">
+                    <p id="ia-estado" class="text-xs text-stone-400 mt-1.5 hidden">✨ Leyendo nombre de archivo...</p>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Nombre Comercial</label>
@@ -383,35 +383,27 @@
             });
         }
 
-        // IA Automática al subir fotos
-        async function analizarImagenConIA(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        // IA basada estrictamente en el nombre del archivo
+        function analizarNombreArchivoIA(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
 
             const estadoIA = document.getElementById('ia-estado');
             estadoIA.classList.remove('hidden');
 
-            // Simulación inteligente de análisis visual adaptada a artesanías creatiyés
+            // Tomamos el nombre del primer archivo (sin la extensión .jpg o .png)
+            let nombreArchivo = files[0].name.replace(/\.[^/.]+$/, "");
+            
+            // Limpiamos guiones bajos y puntos, y ponemos la primera letra en mayúscula
+            nombreArchivo = nombreArchivo.replace(/[_.-]/g, " ");
+            nombreArchivo = nombreArchivo.charAt(0).toUpperCase() + nombreArchivo.slice(1);
+
             setTimeout(() => {
-                const nombresSugeridos = ['Pieza Andina Exclusiva', 'Ornamento Artesanal', 'Diseño en Cerámica', 'Escultura Decorativa', 'Arte Textil Tradicional'];
-                const categoriasSugeridas = ['Decoración', 'Escultura', 'Textil', 'Accesorios', 'Cerámica'];
-                const descripcionesSugeridas = [
-                    'Pieza única elaborada íntegramente a mano con acabados finos y tradicionales.',
-                    'Obra artesanal de alta calidad que resalta por sus texturas y detalles únicos.',
-                    'Diseño exclusivo hecho por manos artesanas, ideal para coleccionistas y amantes del arte.',
-                    'Pieza decorativa de gran elegancia, trabajada con dedicación y técnicas ancestrales.'
-                ];
-
-                const nombreAleatorio = nombresSugeridos[Math.floor(Math.random() * nombresSugeridos.length)];
-                const categoriaAleatoria = categoriasSugeridas[Math.floor(Math.random() * categoriasSugeridas.length)];
-                const descripcionAleatoria = descripcionesSugeridas[Math.floor(Math.random() * descripcionesSugeridas.length)];
-
-                document.getElementById('prod-nombre').value = nombreAleatorio;
-                document.getElementById('prod-categoria').value = categoriaAleatoria;
-                document.getElementById('prod-descripcion').value = descripcionAleatoria;
-
+                document.getElementById('prod-nombre').value = nombreArchivo;
+                document.getElementById('prod-categoria').value = "Artesanía";
+                document.getElementById('prod-descripcion').value = `Pieza exclusiva "${nombreArchivo}" elaborada artesanalmente con acabados tradicionales.`;
                 estadoIA.classList.add('hidden');
-            }, 1200);
+            }, 600);
         }
 
         // Administración y Pestañas
@@ -506,6 +498,7 @@
             document.getElementById('modal-producto').classList.remove('flex');
         }
 
+        // GUARDADO ROBUSTO: Sube fotos una por una de manera segura para evitar que se quede en "Guardando..."
         async function guardarProducto(e) {
             e.preventDefault();
             const btnGuardar = document.getElementById('btn-guardar-prod');
@@ -516,18 +509,22 @@
             const name = document.getElementById('prod-nombre').value;
             const category = document.getElementById('prod-categoria').value;
             const price = parseFloat(document.getElementById('prod-precio').value);
-            const collection_name = document.getElementById('prod-coleccion').value;
+            const collection_name = document.getElementById('prod-coleccion').value || 'General';
             const description = document.getElementById('prod-descripcion').value;
             const status = document.getElementById('prod-estado').value;
             const fileInput = document.getElementById('prod-fotos');
 
             let imageUrls = [];
             if (fileInput.files.length > 0) {
-                for (let file of fileInput.files) {
+                let totalFotos = fileInput.files.length;
+                for (let i = 0; i < totalFotos; i++) {
+                    let file = fileInput.files[i];
+                    btnGuardar.innerText = `Subiendo foto ${i + 1} de ${totalFotos}...`;
                     const filePath = `uploads/${Date.now()}_${Math.random().toString(36).substring(2)}_${file.name}`;
+                    
                     const { data, error } = await supabaseClient.storage.from('productos').upload(filePath, file);
                     if (!error) {
-                        const { data: publicURL } = await supabaseClient.storage.from('productos').getPublicUrl(filePath);
+                        const { data: publicURL } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
                         imageUrls.push(publicURL.publicUrl);
                     }
                 }
@@ -539,6 +536,7 @@
                 productoData.main_image = imageUrls[0];
             }
 
+            btnGuardar.innerText = 'Registrando en base de datos...';
             let error;
             if (id) {
                 if (imageUrls.length === 0) {
