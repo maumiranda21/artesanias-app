@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión y Venta de Artesanías</title>
-    <!-- Tailwind CSS CDN para un diseño profesional -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -38,46 +37,53 @@
                 <p class="text-stone-600">Explora nuestra colección de piezas únicas hechas a mano. Contacta directamente por WhatsApp para adquirir tu pieza favorita.</p>
             </div>
 
-            <!-- Filtros -->
             <div class="flex flex-wrap justify-center gap-2 py-4" id="filtros-categorias">
                 <button onclick="filtrarCategoria('todos')" class="px-4 py-2 rounded-full text-sm font-medium bg-stone-900 text-white shadow-sm">Todas</button>
             </div>
 
-            <!-- Grid de Productos -->
             <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div class="col-span-full text-center py-12 text-stone-500">Cargando piezas...</div>
             </div>
         </section>
 
-        <!-- VISTA: PANEL ADMINISTRATIVO -->
+        <!-- VISTA: PANEL ADMINISTRATIVO PROTEGIDO -->
         <section id="vista-admin" class="hidden space-y-8">
-            <!-- Acceso Admin Directo -->
-            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6 text-center">
-                <div class="space-y-1">
+            <!-- Login con Supabase Auth -->
+            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="text-center space-y-1">
                     <h2 class="text-2xl font-bold text-stone-900">Acceso Administrador</h2>
-                    <p class="text-sm text-stone-500">Ingresa directamente al panel de control de tu tienda.</p>
+                    <p class="text-sm text-stone-500">Ingresa tu correo y contraseña de Supabase para gestionar el inventario.</p>
                 </div>
-                <button onclick="entrarAdminDirecto()" class="w-full py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition shadow-sm">Entrar al Panel de Control</button>
+                <form onsubmit="iniciarSesionAdmin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Correo electrónico</label>
+                        <input type="email" id="login-email" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Contraseña</label>
+                        <input type="password" id="login-password" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition">Iniciar Sesión</button>
+                </form>
             </div>
 
-            <!-- Dashboard Admin -->
+            <!-- Dashboard Admin (Oculto si no hay sesión válida) -->
             <div id="admin-dashboard" class="hidden space-y-8">
                 <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
                     <div>
                         <h2 class="text-xl font-bold text-stone-900">Panel de Control</h2>
-                        <p class="text-sm text-stone-500">Modo Administrador Activo</p>
+                        <p class="text-sm text-stone-500" id="admin-user-email">Administrador autenticado</p>
                     </div>
-                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-xl hover:bg-stone-50">Salir del Panel</button>
+                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-xl hover:bg-stone-50">Cerrar Sesión</button>
                 </div>
 
-                <!-- Pestañas Admin -->
                 <div class="flex border-b border-stone-200 space-x-6">
                     <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-3 border-b-2 border-stone-900 font-semibold text-stone-900">Inventario</button>
                     <button onclick="cambiarPestanaAdmin('importar')" id="tab-importar" class="pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900">Importar Productos</button>
                     <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900">Ventas</button>
                 </div>
 
-                <!-- CONTENIDO INVENTARIO -->
+                <!-- INVENTARIO -->
                 <div id="panel-inventario" class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-stone-900">Gestión de Inventario</h3>
@@ -94,14 +100,12 @@
                                     <th class="p-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-inventario-body" class="divide-y divide-stone-200 text-sm">
-                                <!-- Dinámico -->
-                            </tbody>
+                            <tbody id="tabla-inventario-body" class="divide-y divide-stone-200 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- CONTENIDO IMPORTAR -->
+                <!-- IMPORTAR -->
                 <div id="panel-importar" class="hidden space-y-6">
                     <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
                         <h3 class="text-lg font-bold text-stone-900">Importación Masiva por Carpeta</h3>
@@ -118,11 +122,10 @@
                     </div>
                 </div>
 
-                <!-- CONTENIDO VENTAS -->
+                <!-- VENTAS -->
                 <div id="panel-ventas" class="hidden space-y-6">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-stone-900">Registro de Ventas</h3>
-                        <button onclick="abrirModalVenta()" class="px-4 py-2 bg-stone-900 text-white font-medium rounded-xl text-sm hover:bg-stone-800 transition">Registrar Venta Manual</button>
                     </div>
                     <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
                         <table class="w-full text-left border-collapse">
@@ -132,21 +135,17 @@
                                     <th class="p-4">Producto</th>
                                     <th class="p-4">Precio Final</th>
                                     <th class="p-4">Estado</th>
-                                    <th class="p-4">Observaciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-ventas-body" class="divide-y divide-stone-200 text-sm">
-                                <!-- Dinámico -->
-                            </tbody>
+                            <tbody id="tabla-ventas-body" class="divide-y divide-stone-200 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 
-    <!-- MODAL DE PRODUCTO -->
+    <!-- MODAL PRODUCTO -->
     <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl p-6 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
@@ -194,22 +193,51 @@
         </div>
     </div>
 
-    <!-- SCRIPT -->
     <script>
         const SUPABASE_URL = 'https://mprojuxphdxyvghqoynv.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OVwdEUSZNt9en94i-g-Ulw_QuwLT901';
-        
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let productosGlobal = [];
         let categoriaActual = 'todos';
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('admin_activo') === 'true') {
-                mostrarDashboardAdmin();
-            }
+            verificarSesionReal();
             cargarCatalogoPublico();
         });
+
+        async function verificarSesionReal() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                document.getElementById('admin-user-email').innerText = `Conectado como: ${session.user.email}`;
+                cargarInventarioAdmin();
+                cargarVentasAdmin();
+            } else {
+                document.getElementById('admin-login').classList.remove('hidden');
+                document.getElementById('admin-dashboard').classList.add('hidden');
+            }
+        }
+
+        async function iniciarSesionAdmin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert('Correo o contraseña incorrectos. Verifica tus datos.');
+            } else {
+                verificarSesionReal();
+            }
+        }
+
+        async function cerrarSesionAdmin() {
+            await supabaseClient.auth.signOut();
+            verificarSesionReal();
+            cambiarVista('catalogo');
+        }
 
         function cambiarVista(vista) {
             if (vista === 'catalogo') {
@@ -223,25 +251,8 @@
                 document.getElementById('vista-admin').classList.remove('hidden');
                 document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition';
                 document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
+                verificarSesionReal();
             }
-        }
-
-        function entrarAdminDirecto() {
-            localStorage.setItem('admin_activo', 'true');
-            mostrarDashboardAdmin();
-        }
-
-        function mostrarDashboardAdmin() {
-            document.getElementById('admin-login').classList.add('hidden');
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            cargarInventarioAdmin();
-            cargarVentasAdmin();
-        }
-
-        function cerrarSesionAdmin() {
-            localStorage.removeItem('admin_activo');
-            document.getElementById('admin-login').classList.remove('hidden');
-            document.getElementById('admin-dashboard').classList.add('hidden');
         }
 
         async function cargarCatalogoPublico() {
@@ -362,7 +373,7 @@
             const { data } = await supabaseClient.from('sales').select('*, products(name)').order('created_at', { ascending: false });
             
             if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-stone-500">No hay ventas registradas.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-stone-500">No hay ventas registradas.</td></tr>';
                 return;
             }
 
@@ -372,7 +383,6 @@
                     <td class="p-4 font-medium text-stone-900">${v.products?.name || 'Pieza eliminada'}</td>
                     <td class="p-4 font-medium text-stone-900">$ ${Number(v.sale_price).toFixed(2)}</td>
                     <td class="p-4"><span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold uppercase">${v.status}</span></td>
-                    <td class="p-4 text-stone-600">${v.observations || '-'}</td>
                 </tr>
             `).join('');
         }
@@ -489,10 +499,6 @@
             alert('Importación procesada correctamente. Los productos se han sincronizado con Supabase.');
             cambiarPestanaAdmin('inventario');
             cargarInventarioAdmin();
-        }
-
-        function abrirModalVenta() {
-            alert('Para registrar una venta, edita el producto y cambia su estado a "vendido".');
         }
     </script>
 </body>
