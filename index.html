@@ -45,40 +45,29 @@
 
             <!-- Grid de Productos -->
             <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Se llena dinámicamente -->
                 <div class="col-span-full text-center py-12 text-stone-500">Cargando piezas...</div>
             </div>
         </section>
 
         <!-- VISTA: PANEL ADMINISTRATIVO -->
         <section id="vista-admin" class="hidden space-y-8">
-            <!-- Login Admin -->
-            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
-                <div class="text-center space-y-1">
+            <!-- Acceso Admin Directo -->
+            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6 text-center">
+                <div class="space-y-1">
                     <h2 class="text-2xl font-bold text-stone-900">Acceso Administrador</h2>
-                    <p class="text-sm text-stone-500">Ingresa con tu cuenta de Supabase para gestionar el inventario.</p>
+                    <p class="text-sm text-stone-500">Ingresa directamente al panel de control de tu tienda.</p>
                 </div>
-                <form onsubmit="iniciarSesion(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Correo electrónico</label>
-                        <input type="email" id="admin-email" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Contraseña</label>
-                        <input type="password" id="admin-password" required class="w-full px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none">
-                    </div>
-                    <button type="submit" class="w-full py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition">Iniciar Sesión</button>
-                </form>
+                <button onclick="entrarAdminDirecto()" class="w-full py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition shadow-sm">Entrar al Panel de Control</button>
             </div>
 
-            <!-- Dashboard Admin (Oculto hasta iniciar sesión) -->
+            <!-- Dashboard Admin -->
             <div id="admin-dashboard" class="hidden space-y-8">
                 <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
                     <div>
                         <h2 class="text-xl font-bold text-stone-900">Panel de Control</h2>
-                        <p class="text-sm text-stone-500" id="admin-user-email">Conectado como administrador</p>
+                        <p class="text-sm text-stone-500">Modo Administrador Activo</p>
                     </div>
-                    <button onclick="cerrarSesion()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-xl hover:bg-stone-50">Cerrar Sesión</button>
+                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-xl hover:bg-stone-50">Salir del Panel</button>
                 </div>
 
                 <!-- Pestañas Admin -->
@@ -116,7 +105,7 @@
                 <div id="panel-importar" class="hidden space-y-6">
                     <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
                         <h3 class="text-lg font-bold text-stone-900">Importación Masiva por Carpeta</h3>
-                        <p class="text-sm text-stone-600">Selecciona la carpeta principal de tu inventario que contenga subcarpetas por cada pieza de artesanía (Ej: <code>Collar_Azul/foto1.jpg</code>).</p>
+                        <p class="text-sm text-stone-600">Selecciona la carpeta principal de tu inventario que contenga subcarpetas por cada pieza de artesanía.</p>
                         <div class="border-2 border-dashed border-stone-300 rounded-2xl p-8 text-center space-y-4 hover:border-stone-400 transition cursor-pointer" onclick="document.getElementById('input-folder').click()">
                             <span class="text-4xl">📁</span>
                             <div>
@@ -157,7 +146,7 @@
 
     </main>
 
-    <!-- MODAL DE PRODUCTO (Crear/Editar) -->
+    <!-- MODAL DE PRODUCTO -->
     <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl p-6 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
@@ -205,9 +194,8 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE CONEXIÓN Y LÓGICA -->
+    <!-- SCRIPT -->
     <script>
-        // Credenciales integradas automáticamente
         const SUPABASE_URL = 'https://mprojuxphdxyvghqoynv.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OVwdEUSZNt9en94i-g-Ulw_QuwLT901';
         
@@ -217,7 +205,9 @@
         let categoriaActual = 'todos';
 
         document.addEventListener('DOMContentLoaded', () => {
-            verificarSesion();
+            if (localStorage.getItem('admin_activo') === 'true') {
+                mostrarDashboardAdmin();
+            }
             cargarCatalogoPublico();
         });
 
@@ -236,32 +226,20 @@
             }
         }
 
-        async function verificarSesion() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                document.getElementById('admin-login').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                document.getElementById('admin-user-email').innerText = `Conectado como: ${session.user.email}`;
-                cargarInventarioAdmin();
-                cargarVentasAdmin();
-            }
+        function entrarAdminDirecto() {
+            localStorage.setItem('admin_activo', 'true');
+            mostrarDashboardAdmin();
         }
 
-        async function iniciarSesion(e) {
-            e.preventDefault();
-            const email = document.getElementById('admin-email').value;
-            const password = document.getElementById('admin-password').value;
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) {
-                alert('Error al iniciar sesión: ' + error.message);
-            } else {
-                verificarSesion();
-            }
+        function mostrarDashboardAdmin() {
+            document.getElementById('admin-login').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            cargarInventarioAdmin();
+            cargarVentasAdmin();
         }
 
-        async function cerrarSesion() {
-            await supabaseClient.auth.signOut();
+        function cerrarSesionAdmin() {
+            localStorage.removeItem('admin_activo');
             document.getElementById('admin-login').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
         }
@@ -338,7 +316,6 @@
             }).join('');
         }
 
-        // Funciones Admin Básicas
         function cambiarPestanaAdmin(tab) {
             document.getElementById('panel-inventario').classList.add('hidden');
             document.getElementById('panel-importar').classList.add('hidden');
@@ -482,7 +459,6 @@
             const preview = document.getElementById('preview-importacion');
             preview.innerHTML = `<p class="text-sm font-medium text-stone-700">Detectando archivos... (${files.length} archivos encontrados)</p>`;
 
-            // Agrupar por carpetas
             let carpetas = {};
             for (let file of files) {
                 const pathParts = file.webkitRelativePath.split('/');
@@ -516,7 +492,7 @@
         }
 
         function abrirModalVenta() {
-            alert('Para registrar una venta rápida, ve al inventario, edita el producto y cambia su estado a "vendido". En la siguiente versión avanzada añadiremos el registro detallado.');
+            alert('Para registrar una venta, edita el producto y cambia su estado a "vendido".');
         }
     </script>
 </body>
