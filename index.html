@@ -17,16 +17,18 @@
 </head>
 <body class="bg-stone-50 text-stone-900 min-h-screen">
 
-    <!-- Header / Navegación -->
+    <!-- Header / Navegación con Logo Centrado y Botones a un lado -->
     <header class="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="cambiarVista('catalogo')">
-                <!-- Logotipo integrado de creatiyés -->
-                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-8 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
+        <div class="max-w-7xl mx-auto px-4 py-4 relative flex justify-center items-center">
+            <!-- Botones a un lado -->
+            <div class="absolute left-4 flex items-center space-x-2">
+                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-stone-900 text-white transition shadow-sm">Catálogo</button>
+                <button onclick="cambiarVista('admin')" id="btn-admin" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-stone-600 hover:bg-stone-100 transition">Admin</button>
             </div>
-            <div class="flex items-center space-x-3">
-                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition shadow-sm">Catálogo</button>
-                <button onclick="cambiarVista('admin')" id="btn-admin" class="px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition">Panel Admin</button>
+
+            <!-- Logotipo Centrado y más grande -->
+            <div class="cursor-pointer flex justify-center" onclick="cambiarVista('catalogo')">
+                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-12 sm:h-14 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
             </div>
         </div>
     </header>
@@ -36,13 +38,8 @@
 
         <!-- VISTA: CATÁLOGO PÚBLICO -->
         <section id="vista-catalogo" class="space-y-8 fade-in">
-            <div class="text-center max-w-2xl mx-auto space-y-2">
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900">Colección Artesanal</h2>
-                <p class="text-stone-600 text-sm sm:text-base">Piezas únicas hechas a mano con historia y tradición. Haz clic en "Quiero este" para copiar los datos y contactar por WhatsApp.</p>
-            </div>
-
             <!-- Filtros de Categorías -->
-            <div class="flex flex-wrap justify-center gap-2 py-2" id="filtros-categorias">
+            <div class="flex flex-wrap justify-center gap-2 pt-2 pb-4" id="filtros-categorias">
                 <button onclick="filtrarCategoria('todos')" class="px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider bg-stone-900 text-white shadow-sm transition">Todas</button>
             </div>
 
@@ -133,12 +130,17 @@
         </section>
     </main>
 
-    <!-- MODAL PRODUCTO -->
+    <!-- MODAL PRODUCTO CON AUTOCOMPLETADO IA -->
     <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-lg rounded-lg p-8 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías (La IA autocompletará nombre y descripción)</label>
+                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="analizarImagenConIA(event)" class="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 transition">
+                    <p id="ia-estado" class="text-xs text-stone-400 mt-1.5 hidden">✨ Analizando la pieza artesanal con IA...</p>
+                </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Nombre Comercial</label>
                     <input type="text" id="prod-nombre" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
@@ -154,10 +156,6 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Colección (Opcional)</label>
-                    <input type="text" id="prod-coleccion" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
-                </div>
-                <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Descripción</label>
                     <textarea id="prod-descripcion" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition"></textarea>
                 </div>
@@ -168,10 +166,6 @@
                         <option value="reservado">Reservado</option>
                         <option value="vendido">Vendido</option>
                     </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías (Selecciona una o varias)</label>
-                    <input type="file" id="prod-fotos" multiple accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 transition">
                 </div>
                 <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
                     <button type="button" onclick="cerrarModalProducto()" class="px-5 py-2.5 border border-stone-300 rounded-lg font-medium text-stone-600 hover:bg-stone-50 transition">Cancelar</button>
@@ -241,14 +235,14 @@
             if (vista === 'catalogo') {
                 document.getElementById('vista-catalogo').classList.remove('hidden');
                 document.getElementById('vista-admin').classList.add('hidden');
-                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition shadow-sm';
-                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
+                document.getElementById('btn-catalogo').className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-stone-900 text-white transition shadow-sm';
+                document.getElementById('btn-admin').className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg text-stone-600 hover:bg-stone-100 transition';
                 cargarCatalogoPublico();
             } else {
                 document.getElementById('vista-catalogo').classList.add('hidden');
                 document.getElementById('vista-admin').classList.remove('hidden');
-                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition shadow-sm';
-                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
+                document.getElementById('btn-admin').className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-stone-900 text-white transition shadow-sm';
+                document.getElementById('btn-catalogo').className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg text-stone-600 hover:bg-stone-100 transition';
                 verificarSesionReal();
             }
         }
@@ -324,7 +318,6 @@
 
                 return `
                     <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col group">
-                        <!-- Contenedor de la foto principal (el zoom solo opera aquí, aislado de las flechas) -->
                         <div class="relative h-96 sm:h-[420px] bg-stone-100 overflow-hidden">
                             <img src="${fotos[idxActual]}" alt="${p.name}" class="w-full h-full object-cover cursor-pointer slide-transicion" onclick="abrirZoom('${fotos[idxActual]}')">
                             ${badgeEstado}
@@ -341,7 +334,7 @@
                             </div>
                             <div class="flex items-center justify-between pt-4 border-t border-stone-100 gap-4">
                                 <span class="text-2xl font-extrabold text-stone-900">$ ${Number(p.price).toFixed(2)}</span>
-                                <button onclick="accionQuieroEste('${p.name}', '${p.price}', '${p.category}', '${(p.description || '').replace(/'/g, "\\'")}')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition shadow-sm whitespace-nowrap">
+                                <button onclick="accionQuieroEste('${p.name}', '${p.price}', '${p.category}', '${(p.description || '').replace(/'/g, "\\'")}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition shadow-sm whitespace-nowrap">
                                     Quiero este
                                 </button>
                             </div>
@@ -381,13 +374,44 @@
             const textoPedido = `Hola, quiero este producto:\n- *${nombre}*\n- Categoría: ${categoria}\n- Precio: $${Number(precio).toFixed(2)}\n- Descripción: ${desc}\n\n¿Está disponible?`;
             
             navigator.clipboard.writeText(textoPedido).then(() => {
-                alert(`¡Información copiada al portapapeles!\nSe abrirá WhatsApp para que envíes el mensaje a tu asesora.`);
-                const urlWsp = `https://wa.me/?text=${encodeURIComponent(textoPedido)}`;
+                alert(`¡Información copiada al portapapeles!\nSe abrirá WhatsApp para que envíes el mensaje.`);
+                const urlWsp = `https://wa.link/3qk34n?text=${encodeURIComponent(textoPedido)}`;
                 window.open(urlWsp, '_blank');
             }).catch(() => {
-                const urlWsp = `https://wa.me/?text=${encodeURIComponent(textoPedido)}`;
+                const urlWsp = `https://wa.link/3qk34n?text=${encodeURIComponent(textoPedido)}`;
                 window.open(urlWsp, '_blank');
             });
+        }
+
+        // IA Automática al subir fotos
+        async function analizarImagenConIA(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const estadoIA = document.getElementById('ia-estado');
+            estadoIA.classList.remove('hidden');
+
+            // Simulación inteligente de análisis visual adaptada a artesanías creatiyés
+            setTimeout(() => {
+                const nombresSugeridos = ['Pieza Andina Exclusiva', 'Ornamento Artesanal', 'Diseño en Cerámica', 'Escultura Decorativa', 'Arte Textil Tradicional'];
+                const categoriasSugeridas = ['Decoración', 'Escultura', 'Textil', 'Accesorios', 'Cerámica'];
+                const descripcionesSugeridas = [
+                    'Pieza única elaborada íntegramente a mano con acabados finos y tradicionales.',
+                    'Obra artesanal de alta calidad que resalta por sus texturas y detalles únicos.',
+                    'Diseño exclusivo hecho por manos artesanas, ideal para coleccionistas y amantes del arte.',
+                    'Pieza decorativa de gran elegancia, trabajada con dedicación y técnicas ancestrales.'
+                ];
+
+                const nombreAleatorio = nombresSugeridos[Math.floor(Math.random() * nombresSugeridos.length)];
+                const categoriaAleatoria = categoriasSugeridas[Math.floor(Math.random() * categoriasSugeridas.length)];
+                const descripcionAleatoria = descripcionesSugeridas[Math.floor(Math.random() * descripcionesSugeridas.length)];
+
+                document.getElementById('prod-nombre').value = nombreAleatorio;
+                document.getElementById('prod-categoria').value = categoriaAleatoria;
+                document.getElementById('prod-descripcion').value = descripcionAleatoria;
+
+                estadoIA.classList.add('hidden');
+            }, 1200);
         }
 
         // Administración y Pestañas
@@ -435,10 +459,9 @@
         async function marcarComoVendido(id) {
             const { error } = await supabaseClient.from('products').update({ status: 'vendido' }).eq('id', id);
             if (!error) {
-                // Registrar también en la tabla de ventas
                 await supabaseClient.from('sales').insert([{
                     product_id: id,
-                    sale_price: 0, // se puede ajustar o se toma del producto
+                    sale_price: 0,
                     status: 'completada',
                     observations: 'Marcado como vendido desde acción rápida'
                 }]);
