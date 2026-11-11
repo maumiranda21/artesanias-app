@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artesanías Exclusivas | Catálogo y Gestión</title>
+    <title>creatiyés | Catálogo Exclusivo y Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,15 +18,15 @@
 <body class="bg-stone-50 text-stone-900 min-h-screen">
 
     <!-- Header / Navegación -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="cambiarVista('catalogo')">
-                <span class="text-2xl">🏺</span>
-                <h1 class="text-xl font-bold tracking-tight text-stone-900">Artesanías Únicas</h1>
+                <!-- Logotipo integrado de creatiyés -->
+                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-8 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
             </div>
             <div class="flex items-center space-x-3">
-                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="px-4 py-2 text-sm font-medium rounded-xl bg-stone-900 text-white transition shadow-sm">Catálogo</button>
-                <button onclick="cambiarVista('admin')" id="btn-admin" class="px-4 py-2 text-sm font-medium rounded-xl text-stone-600 hover:bg-stone-100 transition">Panel Admin</button>
+                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition shadow-sm">Catálogo</button>
+                <button onclick="cambiarVista('admin')" id="btn-admin" class="px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition">Panel Admin</button>
             </div>
         </div>
     </header>
@@ -43,7 +43,7 @@
 
             <!-- Filtros de Categorías -->
             <div class="flex flex-wrap justify-center gap-2 py-2" id="filtros-categorias">
-                <button onclick="filtrarCategoria('todos')" class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider bg-stone-900 text-white shadow-sm transition">Todas</button>
+                <button onclick="filtrarCategoria('todos')" class="px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider bg-stone-900 text-white shadow-sm transition">Todas</button>
             </div>
 
             <!-- Grid de Productos -->
@@ -55,7 +55,7 @@
         <!-- VISTA: PANEL ADMINISTRATIVO PROTEGIDO -->
         <section id="vista-admin" class="hidden space-y-8 fade-in">
             <!-- Login -->
-            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-lg border border-stone-200 shadow-sm space-y-6">
                 <div class="text-center space-y-1">
                     <h2 class="text-2xl font-bold tracking-tight text-stone-900">Acceso Administrador</h2>
                     <p class="text-sm text-stone-500">Ingresa tu correo y contraseña para gestionar el inventario.</p>
@@ -63,24 +63,24 @@
                 <form onsubmit="iniciarSesionAdmin(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Correo electrónico</label>
-                        <input type="email" id="login-email" required class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                        <input type="email" id="login-email" required class="w-full px-4 py-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Contraseña</label>
-                        <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                        <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
                     </div>
-                    <button type="submit" class="w-full py-3.5 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition shadow-sm">Iniciar Sesión</button>
+                    <button type="submit" class="w-full py-3.5 bg-stone-900 text-white font-medium rounded-lg hover:bg-stone-800 transition shadow-sm">Iniciar Sesión</button>
                 </form>
             </div>
 
             <!-- Dashboard Admin -->
             <div id="admin-dashboard" class="hidden space-y-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 rounded-2xl border border-stone-200 shadow-sm gap-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 rounded-lg border border-stone-200 shadow-sm gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-stone-900">Panel de Control</h2>
                         <p class="text-sm text-stone-500" id="admin-user-email">Administrador autenticado</p>
                     </div>
-                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-xl hover:bg-stone-50 transition">Cerrar Sesión</button>
+                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-lg hover:bg-stone-50 transition">Cerrar Sesión</button>
                 </div>
 
                 <div class="flex border-b border-stone-200 space-x-6">
@@ -92,9 +92,9 @@
                 <div id="panel-inventario" class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-stone-900">Gestión de Inventario</h3>
-                        <button onclick="abrirModalProducto()" class="px-4 py-2.5 bg-stone-900 text-white font-medium rounded-xl text-sm hover:bg-stone-800 transition shadow-sm">+ Nuevo Producto</button>
+                        <button onclick="abrirModalProducto()" class="px-4 py-2.5 bg-stone-900 text-white font-medium rounded-lg text-sm hover:bg-stone-800 transition shadow-sm">+ Nuevo Producto</button>
                     </div>
-                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+                    <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-stone-50 border-b border-stone-200 text-xs font-semibold uppercase tracking-wider text-stone-500">
@@ -115,7 +115,7 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-stone-900">Registro de Ventas</h3>
                     </div>
-                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+                    <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-stone-50 border-b border-stone-200 text-xs font-semibold uppercase tracking-wider text-stone-500">
@@ -135,35 +135,35 @@
 
     <!-- MODAL PRODUCTO -->
     <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl p-8 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+        <div class="bg-white w-full max-w-lg rounded-lg p-8 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Nombre Comercial</label>
-                    <input type="text" id="prod-nombre" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                    <input type="text" id="prod-nombre" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Categoría</label>
-                        <input type="text" id="prod-categoria" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                        <input type="text" id="prod-categoria" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Precio ($ / S/)</label>
-                        <input type="number" step="0.01" id="prod-precio" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                        <input type="number" step="0.01" id="prod-precio" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Colección (Opcional)</label>
-                    <input type="text" id="prod-coleccion" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                    <input type="text" id="prod-coleccion" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Descripción</label>
-                    <textarea id="prod-descripcion" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition"></textarea>
+                    <textarea id="prod-descripcion" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition"></textarea>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Estado</label>
-                    <select id="prod-estado" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                    <select id="prod-estado" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
                         <option value="disponible">Disponible</option>
                         <option value="reservado">Reservado</option>
                         <option value="vendido">Vendido</option>
@@ -171,20 +171,20 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías (Selecciona una o varias)</label>
-                    <input type="file" id="prod-fotos" multiple accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 transition">
+                    <input type="file" id="prod-fotos" multiple accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 transition">
                 </div>
                 <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
-                    <button type="button" onclick="cerrarModalProducto()" class="px-5 py-2.5 border border-stone-300 rounded-xl font-medium text-stone-600 hover:bg-stone-50 transition">Cancelar</button>
-                    <button type="submit" id="btn-guardar-prod" class="px-6 py-2.5 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition shadow-sm">Guardar Producto</button>
+                    <button type="button" onclick="cerrarModalProducto()" class="px-5 py-2.5 border border-stone-300 rounded-lg font-medium text-stone-600 hover:bg-stone-50 transition">Cancelar</button>
+                    <button type="submit" id="btn-guardar-prod" class="px-6 py-2.5 bg-stone-900 text-white rounded-lg font-medium hover:bg-stone-800 transition shadow-sm">Guardar Producto</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL DE ZOOM PARA FOTOGRAFÍAS -->
+    <!-- MODAL DE ZOOM -->
     <div id="modal-zoom" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
         <div class="relative max-w-4xl max-h-[90vh]">
-            <img id="img-zoom-src" src="" class="max-w-full max-h-[85vh] rounded-xl object-contain shadow-2xl">
+            <img id="img-zoom-src" src="" class="max-w-full max-h-[85vh] rounded-lg object-contain shadow-2xl">
             <button class="absolute top-4 right-4 bg-white/20 hover:bg-white/40 text-white text-xl w-10 h-10 rounded-full flex items-center justify-center transition">×</button>
         </div>
     </div>
@@ -241,14 +241,14 @@
             if (vista === 'catalogo') {
                 document.getElementById('vista-catalogo').classList.remove('hidden');
                 document.getElementById('vista-admin').classList.add('hidden');
-                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-xl bg-stone-900 text-white transition shadow-sm';
-                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-xl text-stone-600 hover:bg-stone-100 transition';
+                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition shadow-sm';
+                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
                 cargarCatalogoPublico();
             } else {
                 document.getElementById('vista-catalogo').classList.add('hidden');
                 document.getElementById('vista-admin').classList.remove('hidden');
-                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-xl bg-stone-900 text-white transition shadow-sm';
-                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-xl text-stone-600 hover:bg-stone-100 transition';
+                document.getElementById('btn-admin').className = 'px-4 py-2 text-sm font-medium rounded-lg bg-stone-900 text-white transition shadow-sm';
+                document.getElementById('btn-catalogo').className = 'px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100 transition';
                 verificarSesionReal();
             }
         }
@@ -273,7 +273,7 @@
             const categorias = ['todos', ...new Set(productosGlobal.map(p => p.category).filter(Boolean))];
             
             contenedor.innerHTML = categorias.map(cat => `
-                <button onclick="filtrarCategoria('${cat}')" class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition ${categoriaActual === cat ? 'bg-stone-900 text-white shadow-sm' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100'}">
+                <button onclick="filtrarCategoria('${cat}')" class="px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition ${categoriaActual === cat ? 'bg-stone-900 text-white shadow-sm' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100'}">
                     ${cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </button>
             `).join('');
@@ -314,22 +314,23 @@
                 let controlesCarrusel = '';
                 if (fotos.length > 1) {
                     controlesCarrusel = `
-                        <button onclick="cambiarFoto('${p.id}', -1, event)" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition shadow-md">‹</button>
-                        <button onclick="cambiarFoto('${p.id}', 1, event)" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition shadow-md">›</button>
-                        <div class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-medium px-2.5 py-1 rounded-md backdrop-blur-sm">
+                        <button onclick="cambiarFoto('${p.id}', -1, event)" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition shadow-md z-20">‹</button>
+                        <button onclick="cambiarFoto('${p.id}', 1, event)" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition shadow-md z-20">›</button>
+                        <div class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-medium px-2.5 py-1 rounded-md backdrop-blur-sm z-10">
                             ${idxActual + 1} / ${fotos.length}
                         </div>
                     `;
                 }
 
                 return `
-                    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col group">
-                        <div class="relative h-96 sm:h-[420px] bg-stone-100 overflow-hidden cursor-pointer" onclick="abrirZoom('${fotos[idxActual]}')">
-                            <img src="${fotos[idxActual]}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 slide-transicion">
+                    <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col group">
+                        <!-- Contenedor de la foto principal (el zoom solo opera aquí, aislado de las flechas) -->
+                        <div class="relative h-96 sm:h-[420px] bg-stone-100 overflow-hidden">
+                            <img src="${fotos[idxActual]}" alt="${p.name}" class="w-full h-full object-cover cursor-pointer slide-transicion" onclick="abrirZoom('${fotos[idxActual]}')">
                             ${badgeEstado}
                             ${controlesCarrusel}
-                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-end justify-center pb-4">
-                                <span class="bg-white/90 backdrop-blur-sm text-stone-900 text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm opacity-0 group-hover:opacity-100 transition">🔍 Ver detalle</span>
+                            <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/50 to-transparent flex justify-center pointer-events-none">
+                                <span class="text-white text-xs font-medium px-3 py-1 rounded-lg bg-black/30 backdrop-blur-sm pointer-events-auto cursor-pointer hover:bg-black/50 transition" onclick="abrirZoom('${fotos[idxActual]}')">🔍 Ver detalle</span>
                             </div>
                         </div>
                         <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
@@ -338,12 +339,10 @@
                                 <h3 class="text-xl font-bold text-stone-900 tracking-tight">${p.name}</h3>
                                 <p class="text-sm text-stone-600 line-clamp-2 leading-relaxed">${p.description || 'Pieza artesanal única elaborada a mano.'}</p>
                             </div>
-                            <div class="space-y-3 pt-4 border-t border-stone-100">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-2xl font-extrabold text-stone-900">$ ${Number(p.price).toFixed(2)}</span>
-                                </div>
-                                <button onclick="accionQuieroEste('${p.name}', '${p.price}', '${p.category}', '${(p.description || '').replace(/'/g, "\\'")}')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center space-x-2 shadow-sm">
-                                    <span>Quiero este</span>
+                            <div class="flex items-center justify-between pt-4 border-t border-stone-100 gap-4">
+                                <span class="text-2xl font-extrabold text-stone-900">$ ${Number(p.price).toFixed(2)}</span>
+                                <button onclick="accionQuieroEste('${p.name}', '${p.price}', '${p.category}', '${(p.description || '').replace(/'/g, "\\'")}')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition shadow-sm whitespace-nowrap">
+                                    Quiero este
                                 </button>
                             </div>
                         </div>
@@ -414,7 +413,7 @@
             tbody.innerHTML = data.map(p => `
                 <tr class="hover:bg-stone-50/80 transition">
                     <td class="p-4 font-medium text-stone-900 flex items-center space-x-3">
-                        <img src="${p.main_image || (p.images && p.images[0]) || 'https://via.placeholder.com/40'}" class="w-12 h-12 rounded-xl object-cover border border-stone-200">
+                        <img src="${p.main_image || (p.images && p.images[0]) || 'https://via.placeholder.com/40'}" class="w-12 h-12 rounded-lg object-cover border border-stone-200">
                         <span>${p.name}</span>
                     </td>
                     <td class="p-4 text-stone-600">${p.category || '-'}</td>
@@ -425,11 +424,29 @@
                         </span>
                     </td>
                     <td class="p-4 text-right space-x-2">
+                        ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${p.id}')" class="text-emerald-700 hover:text-emerald-900 font-medium text-xs px-3 py-1.5 border border-emerald-200 rounded-lg hover:bg-emerald-50 transition">Marcar vendido</button>` : ''}
                         <button onclick="editarProducto('${p.id}')" class="text-stone-700 hover:text-stone-900 font-medium text-xs px-3 py-1.5 border border-stone-200 rounded-lg hover:bg-white transition">Editar</button>
                         <button onclick="eliminarProducto('${p.id}')" class="text-red-600 hover:text-red-800 font-medium text-xs px-3 py-1.5 border border-red-200 rounded-lg hover:bg-red-50 transition">Eliminar</button>
                     </td>
                 </tr>
             `).join('');
+        }
+
+        async function marcarComoVendido(id) {
+            const { error } = await supabaseClient.from('products').update({ status: 'vendido' }).eq('id', id);
+            if (!error) {
+                // Registrar también en la tabla de ventas
+                await supabaseClient.from('sales').insert([{
+                    product_id: id,
+                    sale_price: 0, // se puede ajustar o se toma del producto
+                    status: 'completada',
+                    observations: 'Marcado como vendido desde acción rápida'
+                }]);
+                cargarInventarioAdmin();
+                cargarVentasAdmin();
+            } else {
+                alert('Error al actualizar estado: ' + error.message);
+            }
         }
 
         async function cargarVentasAdmin() {
