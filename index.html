@@ -3,126 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>creatiyés | Catálogo Exclusivo y Gestión</title>
+    <title>creatiyés | Catálogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
-        h1, h2, h3, h4 { line-height: 1.15 !important; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        .slide-transicion { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+        h1, h2, h3, h4 { line-height: 1.15; }
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #1c1917; outline-offset: 2px; }
+        .pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
     </style>
 </head>
-<body class="bg-stone-50 text-stone-900 min-h-screen">
+<body class="bg-white text-stone-900 min-h-screen">
 
-    <!-- Header / Navegación con Logo Centrado y Botones a un lado -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 relative flex justify-center items-center">
-            <!-- Botones a un lado -->
-            <div class="absolute left-4 flex items-center space-x-2">
-                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-stone-900 text-white transition shadow-sm">Catálogo</button>
-                <button onclick="cambiarVista('admin')" id="btn-admin" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-stone-600 hover:bg-stone-100 transition">Admin</button>
-            </div>
-
-            <!-- Logotipo Centrado -->
-            <div class="cursor-pointer flex justify-center" onclick="cambiarVista('catalogo')">
-                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-12 sm:h-14 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
-            </div>
+    <!-- Logo centrado -->
+    <header class="pt-10 pb-6 flex justify-center">
+        <div class="cursor-pointer" onclick="cambiarVista('catalogo')">
+            <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-16 sm:h-20 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
         </div>
     </header>
 
-    <!-- Contenedor Principal -->
-    <main class="max-w-7xl mx-auto px-4 py-8">
+    <main class="max-w-6xl mx-auto px-4 pb-28">
 
-        <!-- VISTA: CATÁLOGO PÚBLICO -->
-        <section id="vista-catalogo" class="space-y-8 fade-in">
-            <!-- Filtros de Categorías -->
-            <div class="flex flex-wrap justify-center gap-2 pt-2 pb-4" id="filtros-categorias">
-                <button onclick="filtrarCategoria('todos')" class="px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider bg-stone-900 text-white shadow-sm transition">Todas</button>
-            </div>
-
-            <!-- Grid de Productos -->
-            <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="col-span-full text-center py-16 text-stone-400">Cargando piezas exclusivas...</div>
+        <!-- CATÁLOGO PÚBLICO -->
+        <section id="vista-catalogo" class="space-y-10 fade-in">
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2" id="filtros-categorias"></div>
+            <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                <div class="col-span-full text-center py-16 text-stone-400 text-sm">Cargando piezas…</div>
             </div>
         </section>
 
-        <!-- VISTA: PANEL ADMINISTRATIVO PROTEGIDO -->
+        <!-- PANEL ADMIN -->
         <section id="vista-admin" class="hidden space-y-8 fade-in">
             <!-- Login -->
-            <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-lg border border-stone-200 shadow-sm space-y-6">
+            <div id="admin-login" class="max-w-sm mx-auto pt-6 space-y-6">
                 <div class="text-center space-y-1">
-                    <h2 class="text-2xl font-bold tracking-tight text-stone-900">Acceso Administrador</h2>
-                    <p class="text-sm text-stone-500">Ingresa tu correo y contraseña para gestionar el inventario.</p>
+                    <h2 class="text-xl font-semibold">Acceso administrador</h2>
+                    <p class="text-sm text-stone-500">Ingresa con tu correo y contraseña.</p>
                 </div>
                 <form onsubmit="iniciarSesionAdmin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Correo electrónico</label>
-                        <input type="email" id="login-email" required class="w-full px-4 py-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                        <label class="block text-sm text-stone-600 mb-1" for="login-email">Correo electrónico</label>
+                        <input type="email" id="login-email" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Contraseña</label>
-                        <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                        <label class="block text-sm text-stone-600 mb-1" for="login-password">Contraseña</label>
+                        <input type="password" id="login-password" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
                     </div>
-                    <button type="submit" class="w-full py-3.5 bg-stone-900 text-white font-medium rounded-lg hover:bg-stone-800 transition shadow-sm">Iniciar Sesión</button>
+                    <button type="submit" class="w-full py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition">Iniciar sesión</button>
                 </form>
             </div>
 
-            <!-- Dashboard Admin -->
+            <!-- Dashboard -->
             <div id="admin-dashboard" class="hidden space-y-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 rounded-lg border border-stone-200 shadow-sm gap-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-stone-200">
                     <div>
-                        <h2 class="text-xl font-bold text-stone-900">Panel de Control</h2>
-                        <p class="text-sm text-stone-500" id="admin-user-email">Administrador autenticado</p>
+                        <h2 class="text-xl font-semibold">Panel de control</h2>
+                        <p class="text-sm text-stone-500" id="admin-user-email"></p>
                     </div>
-                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm font-medium border border-stone-300 rounded-lg hover:bg-stone-50 transition">Cerrar Sesión</button>
+                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm border border-stone-300 rounded-md hover:bg-stone-50 transition">Cerrar sesión</button>
                 </div>
 
-                <div class="flex border-b border-stone-200 space-x-6">
-                    <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-3 border-b-2 border-stone-900 font-semibold text-stone-900 transition">Inventario</button>
-                    <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900 transition">Ventas</button>
+                <div class="flex space-x-6 border-b border-stone-200">
+                    <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-3 -mb-px border-b-2 border-stone-900 font-semibold text-sm">Inventario</button>
+                    <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 -mb-px border-b-2 border-transparent text-stone-500 hover:text-stone-900 text-sm">Ventas</button>
                 </div>
 
-                <!-- INVENTARIO -->
-                <div id="panel-inventario" class="space-y-6">
+                <!-- Inventario -->
+                <div id="panel-inventario" class="space-y-4">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-stone-900">Gestión de Inventario</h3>
-                        <button onclick="abrirModalProducto()" class="px-4 py-2.5 bg-stone-900 text-white font-medium rounded-lg text-sm hover:bg-stone-800 transition shadow-sm">+ Nuevo Producto</button>
+                        <h3 class="text-base font-semibold">Inventario</h3>
+                        <button onclick="abrirModalProducto()" class="px-4 py-2 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition">Nuevo producto</button>
                     </div>
-                    <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm">
-                        <table class="w-full text-left border-collapse">
+                    <div class="overflow-x-auto border border-stone-200 rounded-md">
+                        <table class="w-full text-left border-collapse min-w-[640px]">
                             <thead>
-                                <tr class="bg-stone-50 border-b border-stone-200 text-xs font-semibold uppercase tracking-wider text-stone-500">
-                                    <th class="p-4">Pieza</th>
-                                    <th class="p-4">Categoría</th>
-                                    <th class="p-4">Precio</th>
-                                    <th class="p-4">Estado</th>
-                                    <th class="p-4 text-right">Acciones</th>
+                                <tr class="border-b border-stone-200 text-xs text-stone-500">
+                                    <th class="p-4 font-medium">Pieza</th>
+                                    <th class="p-4 font-medium">Categoría</th>
+                                    <th class="p-4 font-medium">Precio</th>
+                                    <th class="p-4 font-medium">Estado</th>
+                                    <th class="p-4 font-medium text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-inventario-body" class="divide-y divide-stone-200 text-sm"></tbody>
+                            <tbody id="tabla-inventario-body" class="divide-y divide-stone-100 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- VENTAS -->
-                <div id="panel-ventas" class="hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-stone-900">Registro de Ventas</h3>
-                    </div>
-                    <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm">
-                        <table class="w-full text-left border-collapse">
+                <!-- Ventas -->
+                <div id="panel-ventas" class="hidden space-y-4">
+                    <h3 class="text-base font-semibold">Registro de ventas</h3>
+                    <div class="overflow-x-auto border border-stone-200 rounded-md">
+                        <table class="w-full text-left border-collapse min-w-[480px]">
                             <thead>
-                                <tr class="bg-stone-50 border-b border-stone-200 text-xs font-semibold uppercase tracking-wider text-stone-500">
-                                    <th class="p-4">Fecha</th>
-                                    <th class="p-4">Producto</th>
-                                    <th class="p-4">Precio Final</th>
-                                    <th class="p-4">Estado</th>
+                                <tr class="border-b border-stone-200 text-xs text-stone-500">
+                                    <th class="p-4 font-medium">Fecha</th>
+                                    <th class="p-4 font-medium">Producto</th>
+                                    <th class="p-4 font-medium">Precio final</th>
+                                    <th class="p-4 font-medium">Estado</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-ventas-body" class="divide-y divide-stone-200 text-sm"></tbody>
+                            <tbody id="tabla-ventas-body" class="divide-y divide-stone-100 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -130,60 +115,71 @@
         </section>
     </main>
 
-    <!-- MODAL PRODUCTO -->
-    <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-lg rounded-lg p-8 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
-            <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
+    <!-- Navegación inferior -->
+    <nav class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-stone-200 pt-3 pb-safe">
+        <div class="flex justify-center space-x-10">
+            <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="text-sm font-semibold text-stone-900 border-b-2 border-stone-900 pb-1 transition">Catálogo</button>
+            <button onclick="cambiarVista('admin')" id="btn-admin" class="text-sm font-medium text-stone-500 border-b-2 border-transparent pb-1 hover:text-stone-900 transition">Panel</button>
+        </div>
+    </nav>
+
+    <!-- Modal producto -->
+    <div id="modal-producto" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-lg rounded-lg p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+            <h3 id="modal-titulo" class="text-lg font-semibold">Nuevo producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Fotografías (La IA leerá el nombre del archivo)</label>
-                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="analizarNombreArchivoIA(event)" class="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 transition">
-                    <p id="ia-estado" class="text-xs text-stone-400 mt-1.5 hidden">✨ Leyendo nombre de archivo...</p>
+                    <label class="block text-sm text-stone-600 mb-1" for="prod-fotos">Fotografías</label>
+                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="analizarNombreArchivoIA(event)" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200">
+                    <p id="ia-estado" class="text-xs text-stone-400 mt-1.5 hidden">Leyendo nombre de archivo…</p>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Nombre Comercial</label>
-                    <input type="text" id="prod-nombre" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                    <label class="block text-sm text-stone-600 mb-1" for="prod-nombre">Nombre</label>
+                    <input type="text" id="prod-nombre" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Categoría</label>
-                        <input type="text" id="prod-categoria" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                        <label class="block text-sm text-stone-600 mb-1" for="prod-categoria">Categoría</label>
+                        <input type="text" id="prod-categoria" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Precio ($ / S/)</label>
-                        <input type="number" step="0.01" id="prod-precio" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                        <label class="block text-sm text-stone-600 mb-1" for="prod-precio">Precio</label>
+                        <input type="number" step="0.01" id="prod-precio" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Descripción</label>
-                    <textarea id="prod-descripcion" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition"></textarea>
+                    <label class="block text-sm text-stone-600 mb-1" for="prod-coleccion">Colección (opcional)</label>
+                    <input type="text" id="prod-coleccion" class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Estado</label>
-                    <select id="prod-estado" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-900 focus:outline-none transition">
+                    <label class="block text-sm text-stone-600 mb-1" for="prod-descripcion">Descripción</label>
+                    <textarea id="prod-descripcion" rows="3" class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-stone-600 mb-1" for="prod-estado">Estado</label>
+                    <select id="prod-estado" class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none bg-white">
                         <option value="disponible">Disponible</option>
                         <option value="reservado">Reservado</option>
                         <option value="vendido">Vendido</option>
                     </select>
                 </div>
-                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
-                    <button type="button" onclick="cerrarModalProducto()" class="px-5 py-2.5 border border-stone-300 rounded-lg font-medium text-stone-600 hover:bg-stone-50 transition">Cancelar</button>
-                    <button type="submit" id="btn-guardar-prod" class="px-6 py-2.5 bg-stone-900 text-white rounded-lg font-medium hover:bg-stone-800 transition shadow-sm">Guardar Producto</button>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-100">
+                    <button type="button" onclick="cerrarModalProducto()" class="px-5 py-2.5 border border-stone-300 rounded-md text-sm text-stone-600 hover:bg-stone-50 transition">Cancelar</button>
+                    <button type="submit" id="btn-guardar-prod" class="px-6 py-2.5 bg-stone-900 text-white rounded-md text-sm font-medium hover:bg-stone-700 transition disabled:opacity-60">Guardar producto</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL DE ZOOM -->
-    <div id="modal-zoom" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
+    <!-- Modal zoom -->
+    <div id="modal-zoom" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
         <div class="relative max-w-4xl max-h-[90vh]">
-            <img id="img-zoom-src" src="" class="max-w-full max-h-[85vh] rounded-lg object-contain shadow-2xl">
-            <button class="absolute top-4 right-4 bg-white/20 hover:bg-white/40 text-white text-xl w-10 h-10 rounded-full flex items-center justify-center transition">×</button>
+            <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[85vh] rounded-md object-contain">
+            <button class="absolute top-3 right-3 bg-white/20 hover:bg-white/40 text-white text-xl w-10 h-10 rounded-full flex items-center justify-center transition" aria-label="Cerrar">×</button>
         </div>
     </div>
 
-    <!-- SCRIPT -->
     <script>
         const SUPABASE_URL = 'https://mprojuxphdxyvghqoynv.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OVwdEUSZNt9en94i-g-Ulw_QuwLT901';
@@ -193,6 +189,9 @@
         let categoriaActual = 'todos';
         let carruselIndices = {};
 
+        const $ = (id) => document.getElementById(id);
+        const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
         document.addEventListener('DOMContentLoaded', () => {
             verificarSesionReal();
             cargarCatalogoPublico();
@@ -201,28 +200,24 @@
         async function verificarSesionReal() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
-                document.getElementById('admin-login').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                document.getElementById('admin-user-email').innerText = `Conectado como: ${session.user.email}`;
+                $('admin-login').classList.add('hidden');
+                $('admin-dashboard').classList.remove('hidden');
+                $('admin-user-email').innerText = `Conectado como ${session.user.email}`;
                 cargarInventarioAdmin();
                 cargarVentasAdmin();
             } else {
-                document.getElementById('admin-login').classList.remove('hidden');
-                document.getElementById('admin-dashboard').classList.add('hidden');
+                $('admin-login').classList.remove('hidden');
+                $('admin-dashboard').classList.add('hidden');
             }
         }
 
         async function iniciarSesionAdmin(e) {
             e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) {
-                alert('Correo o contraseña incorrectos.');
-            } else {
-                verificarSesionReal();
-            }
+            const email = $('login-email').value;
+            const password = $('login-password').value;
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) alert('Correo o contraseña incorrectos.');
+            else verificarSesionReal();
         }
 
         async function cerrarSesionAdmin() {
@@ -232,45 +227,44 @@
         }
 
         function cambiarVista(vista) {
+            const activo = 'text-sm font-semibold text-stone-900 border-b-2 border-stone-900 pb-1 transition';
+            const inactivo = 'text-sm font-medium text-stone-500 border-b-2 border-transparent pb-1 hover:text-stone-900 transition';
             if (vista === 'catalogo') {
-                document.getElementById('vista-catalogo').classList.remove('hidden');
-                document.getElementById('vista-admin').classList.add('hidden');
-                document.getElementById('btn-catalogo').className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-stone-900 text-white transition shadow-sm';
-                document.getElementById('btn-admin').className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg text-stone-600 hover:bg-stone-100 transition';
+                $('vista-catalogo').classList.remove('hidden');
+                $('vista-admin').classList.add('hidden');
+                $('btn-catalogo').className = activo;
+                $('btn-admin').className = inactivo;
                 cargarCatalogoPublico();
             } else {
-                document.getElementById('vista-catalogo').classList.add('hidden');
-                document.getElementById('vista-admin').classList.remove('hidden');
-                document.getElementById('btn-admin').className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-stone-900 text-white transition shadow-sm';
-                document.getElementById('btn-catalogo').className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg text-stone-600 hover:bg-stone-100 transition';
+                $('vista-catalogo').classList.add('hidden');
+                $('vista-admin').classList.remove('hidden');
+                $('btn-admin').className = activo;
+                $('btn-catalogo').className = inactivo;
                 verificarSesionReal();
             }
+            window.scrollTo({ top: 0 });
         }
 
         async function cargarCatalogoPublico() {
-            const grid = document.getElementById('grid-productos');
-            grid.innerHTML = '<div class="col-span-full text-center py-16 text-stone-400">Cargando piezas exclusivas...</div>';
-
+            const grid = $('grid-productos');
             const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
             if (error) {
-                grid.innerHTML = `<div class="col-span-full text-center py-16 text-red-500">Error al cargar productos: ${error.message}</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-16 text-red-600 text-sm">No se pudieron cargar los productos: ${esc(error.message)}</div>`;
                 return;
             }
-
             productosGlobal = data || [];
             actualizarFiltrosCategorias();
             renderizarProductos();
         }
 
         function actualizarFiltrosCategorias() {
-            const contenedor = document.getElementById('filtros-categorias');
             const categorias = ['todos', ...new Set(productosGlobal.map(p => p.category).filter(Boolean))];
-            
-            contenedor.innerHTML = categorias.map(cat => `
-                <button onclick="filtrarCategoria('${cat}')" class="px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition ${categoriaActual === cat ? 'bg-stone-900 text-white shadow-sm' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100'}">
-                    ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+            $('filtros-categorias').innerHTML = categorias.map(cat => `
+                <button data-cat="${esc(cat)}" class="text-sm pb-1 border-b-2 transition ${categoriaActual === cat ? 'border-stone-900 text-stone-900 font-semibold' : 'border-transparent text-stone-500 hover:text-stone-900'}">
+                    ${esc(cat === 'todos' ? 'Todas' : cat.charAt(0).toUpperCase() + cat.slice(1))}
                 </button>
             `).join('');
+            $('filtros-categorias').querySelectorAll('button').forEach(b => b.addEventListener('click', () => filtrarCategoria(b.dataset.cat)));
         }
 
         function filtrarCategoria(cat) {
@@ -279,167 +273,143 @@
             renderizarProductos();
         }
 
+        function fotosDe(p) {
+            if (Array.isArray(p.images) && p.images.length > 0) return p.images;
+            if (p.main_image) return [p.main_image];
+            return ['https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=800&q=80'];
+        }
+
         function renderizarProductos() {
-            const grid = document.getElementById('grid-productos');
+            const grid = $('grid-productos');
             const filtrados = categoriaActual === 'todos' ? productosGlobal : productosGlobal.filter(p => p.category === categoriaActual);
 
             if (filtrados.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-16 text-stone-400">No hay piezas artesanales en esta categoría.</div>';
+                grid.innerHTML = '<div class="col-span-full text-center py-16 text-stone-400 text-sm">No hay piezas en esta categoría.</div>';
                 return;
             }
 
             grid.innerHTML = filtrados.map(p => {
-                let fotos = [];
-                if (Array.isArray(p.images) && p.images.length > 0) {
-                    fotos = p.images;
-                } else if (p.main_image) {
-                    fotos = [p.main_image];
-                } else {
-                    fotos = ['https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=800&q=80'];
-                }
-
+                const fotos = fotosDe(p);
                 if (carruselIndices[p.id] === undefined) carruselIndices[p.id] = 0;
-                let idxActual = carruselIndices[p.id];
-                if (idxActual >= fotos.length) idxActual = 0;
+                let idx = carruselIndices[p.id];
+                if (idx >= fotos.length) idx = 0;
 
-                const badgeEstado = p.status === 'vendido' ? '<span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-sm">Vendido</span>' : 
-                                    p.status === 'reservado' ? '<span class="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-sm">Reservado</span>' : '';
+                const badge = p.status === 'vendido' ? '<span class="absolute top-3 left-3 bg-white text-stone-900 text-xs font-medium px-2.5 py-1 rounded-md">Vendido</span>'
+                            : p.status === 'reservado' ? '<span class="absolute top-3 left-3 bg-white text-stone-900 text-xs font-medium px-2.5 py-1 rounded-md">Reservado</span>' : '';
 
-                let controlesCarrusel = '';
-                if (fotos.length > 1) {
-                    controlesCarrusel = `
-                        <button onclick="cambiarFoto('${p.id}', -1, event)" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition shadow-md z-20">‹</button>
-                        <button onclick="cambiarFoto('${p.id}', 1, event)" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition shadow-md z-20">›</button>
-                        <div class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-medium px-2.5 py-1 rounded-md backdrop-blur-sm z-10">
-                            ${idxActual + 1} / ${fotos.length}
-                        </div>
-                    `;
-                }
+                const controles = fotos.length > 1 ? `
+                    <button onclick="cambiarFoto('${esc(p.id)}', -1, event)" aria-label="Foto anterior" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-stone-900 w-8 h-8 rounded-full flex items-center justify-center z-20">‹</button>
+                    <button onclick="cambiarFoto('${esc(p.id)}', 1, event)" aria-label="Foto siguiente" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-stone-900 w-8 h-8 rounded-full flex items-center justify-center z-20">›</button>
+                    <div class="absolute bottom-3 right-3 bg-white/90 text-stone-900 text-xs px-2 py-0.5 rounded-md z-10">${idx + 1}/${fotos.length}</div>` : '';
 
                 return `
-                    <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col group">
-                        <div class="relative h-96 sm:h-[420px] bg-stone-100 overflow-hidden">
-                            <img src="${fotos[idxActual]}" alt="${p.name}" class="w-full h-full object-cover cursor-pointer slide-transicion" onclick="abrirZoom('${fotos[idxActual]}')">
-                            ${badgeEstado}
-                            ${controlesCarrusel}
-                            <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/50 to-transparent flex justify-center pointer-events-none">
-                                <span class="text-white text-xs font-medium px-3 py-1 rounded-lg bg-black/30 backdrop-blur-sm pointer-events-auto cursor-pointer hover:bg-black/50 transition" onclick="abrirZoom('${fotos[idxActual]}')">🔍 Ver detalle</span>
+                    <article class="flex flex-col">
+                        <div class="relative aspect-[4/5] bg-stone-100 overflow-hidden rounded-md">
+                            <img src="${esc(fotos[idx])}" alt="${esc(p.name)}" class="w-full h-full object-cover cursor-zoom-in" onclick="abrirZoom('${esc(fotos[idx])}')">
+                            ${badge}
+                            ${controles}
+                        </div>
+                        <div class="pt-4 space-y-1">
+                            <p class="text-xs text-stone-400">${esc(p.category || 'General')}</p>
+                            <h3 class="text-base font-semibold">${esc(p.name)}</h3>
+                            <p class="text-sm text-stone-500 line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
+                            <div class="flex items-center justify-between pt-3">
+                                <span class="text-lg font-semibold">$ ${Number(p.price).toFixed(2)}</span>
+                                <button data-id="${esc(p.id)}" class="btn-quiero px-4 py-2 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-sm font-medium rounded-md transition">Quiero este</button>
                             </div>
                         </div>
-                        <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
-                            <div class="space-y-1">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">${p.category || 'General'}</span>
-                                <h3 class="text-xl font-bold text-stone-900 tracking-tight">${p.name}</h3>
-                                <p class="text-sm text-stone-600 line-clamp-2 leading-relaxed">${p.description || 'Pieza artesanal única elaborada a mano.'}</p>
-                            </div>
-                            <div class="flex items-center justify-between pt-4 border-t border-stone-100 gap-4">
-                                <span class="text-2xl font-extrabold text-stone-900">$ ${Number(p.price).toFixed(2)}</span>
-                                <button onclick="accionQuieroEste('${p.name}', '${p.price}', '${p.category}', '${(p.description || '').replace(/'/g, "\\'")}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition shadow-sm whitespace-nowrap">
-                                    Quiero este
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    </article>`;
             }).join('');
+
+            grid.querySelectorAll('.btn-quiero').forEach(b => b.addEventListener('click', () => {
+                const p = productosGlobal.find(x => String(x.id) === b.dataset.id);
+                if (p) accionQuieroEste(p);
+            }));
         }
 
         function cambiarFoto(idProd, direccion, event) {
             event.stopPropagation();
-            const producto = productosGlobal.find(p => p.id === idProd);
-            if (!producto) return;
-            let fotos = producto.images && producto.images.length > 0 ? producto.images : [producto.main_image];
-            
-            if (carruselIndices[idProd] === undefined) carruselIndices[idProd] = 0;
-            carruselIndices[idProd] += direccion;
-
-            if (carruselIndices[idProd] < 0) carruselIndices[idProd] = fotos.length - 1;
-            if (carruselIndices[idProd] >= fotos.length) carruselIndices[idProd] = 0;
-
+            const p = productosGlobal.find(x => String(x.id) === String(idProd));
+            if (!p) return;
+            const total = fotosDe(p).length;
+            let i = (carruselIndices[p.id] || 0) + direccion;
+            if (i < 0) i = total - 1;
+            if (i >= total) i = 0;
+            carruselIndices[p.id] = i;
             renderizarProductos();
         }
 
-        function abrirZoom(urlImg) {
-            document.getElementById('img-zoom-src').src = urlImg;
-            document.getElementById('modal-zoom').classList.remove('hidden');
-            document.getElementById('modal-zoom').classList.add('flex');
+        function abrirZoom(url) {
+            $('img-zoom-src').src = url;
+            $('modal-zoom').classList.remove('hidden');
+            $('modal-zoom').classList.add('flex');
         }
-
         function cerrarZoom() {
-            document.getElementById('modal-zoom').classList.add('hidden');
-            document.getElementById('modal-zoom').classList.remove('flex');
+            $('modal-zoom').classList.add('hidden');
+            $('modal-zoom').classList.remove('flex');
         }
 
-        function accionQuieroEste(nombre, precio, categoria, desc) {
-            const textoPedido = `Hola, quiero este producto:\n- *${nombre}*\n- Categoría: ${categoria}\n- Precio: $${Number(precio).toFixed(2)}\n- Descripción: ${desc}\n\n¿Está disponible?`;
-            
-            navigator.clipboard.writeText(textoPedido).then(() => {
-                alert(`¡Información copiada al portapapeles!\nSe abrirá WhatsApp para que envíes el mensaje.`);
-                const urlWsp = `https://wa.link/3qk34n?text=${encodeURIComponent(textoPedido)}`;
-                window.open(urlWsp, '_blank');
-            }).catch(() => {
-                const urlWsp = `https://wa.link/3qk34n?text=${encodeURIComponent(textoPedido)}`;
-                window.open(urlWsp, '_blank');
-            });
+        function accionQuieroEste(p) {
+            const texto = `Hola, quiero este producto:\n- *${p.name}*\n- Categoría: ${p.category || '-'}\n- Precio: $${Number(p.price).toFixed(2)}\n- Descripción: ${p.description || ''}\n\n¿Está disponible?`;
+            const url = `https://wa.link/3qk34n?text=${encodeURIComponent(texto)}`;
+            const abrir = () => window.open(url, '_blank');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(texto).then(() => {
+                    alert('Información copiada. Se abrirá WhatsApp para que envíes el mensaje.');
+                    abrir();
+                }).catch(abrir);
+            } else abrir();
         }
 
-        // IA basada estrictamente en el nombre del archivo
+        // Autocompleta nombre/descr. a partir del nombre del archivo
         function analizarNombreArchivoIA(e) {
             const files = e.target.files;
             if (!files || files.length === 0) return;
+            const estado = $('ia-estado');
+            estado.classList.remove('hidden');
 
-            const estadoIA = document.getElementById('ia-estado');
-            estadoIA.classList.remove('hidden');
-
-            let nombreArchivo = files[0].name.replace(/\.[^/.]+$/, "");
-            nombreArchivo = nombreArchivo.replace(/[_.-]/g, " ");
-            nombreArchivo = nombreArchivo.charAt(0).toUpperCase() + nombreArchivo.slice(1);
+            let nombre = files[0].name.replace(/\.[^/.]+$/, '').replace(/[_.-]/g, ' ');
+            nombre = nombre.charAt(0).toUpperCase() + nombre.slice(1);
 
             setTimeout(() => {
-                document.getElementById('prod-nombre').value = nombreArchivo;
-                document.getElementById('prod-categoria').value = "Artesanía";
-                document.getElementById('prod-descripcion').value = `Pieza exclusiva "${nombreArchivo}" elaborada artesanalmente con acabados tradicionales.`;
-                estadoIA.classList.add('hidden');
-            }, 400);
+                if (!$('prod-nombre').value) $('prod-nombre').value = nombre;
+                if (!$('prod-categoria').value) $('prod-categoria').value = 'Artesanía';
+                if (!$('prod-descripcion').value) $('prod-descripcion').value = `Pieza exclusiva "${nombre}" elaborada artesanalmente con acabados tradicionales.`;
+                estado.classList.add('hidden');
+            }, 300);
         }
 
-        // Administración y Pestañas
         function cambiarPestanaAdmin(tab) {
-            document.getElementById('panel-inventario').classList.add('hidden');
-            document.getElementById('panel-ventas').classList.add('hidden');
-            document.getElementById('tab-inventario').className = 'pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900 transition';
-            document.getElementById('tab-ventas').className = 'pb-3 border-b-2 border-transparent text-stone-500 hover:text-stone-900 transition';
-
-            document.getElementById(`panel-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).className = 'pb-3 border-b-2 border-stone-900 font-semibold text-stone-900 transition';
+            $('panel-inventario').classList.add('hidden');
+            $('panel-ventas').classList.add('hidden');
+            $('tab-inventario').className = 'pb-3 -mb-px border-b-2 border-transparent text-stone-500 hover:text-stone-900 text-sm';
+            $('tab-ventas').className = 'pb-3 -mb-px border-b-2 border-transparent text-stone-500 hover:text-stone-900 text-sm';
+            $(`panel-${tab}`).classList.remove('hidden');
+            $(`tab-${tab}`).className = 'pb-3 -mb-px border-b-2 border-stone-900 font-semibold text-sm';
         }
 
         async function cargarInventarioAdmin() {
-            const tbody = document.getElementById('tabla-inventario-body');
+            const tbody = $('tabla-inventario-body');
             const { data } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
-            
             if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-stone-400">No hay productos registrados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-stone-400">Aún no hay productos. Agrega el primero con “Nuevo producto”.</td></tr>';
                 return;
             }
-
             tbody.innerHTML = data.map(p => `
-                <tr class="hover:bg-stone-50/80 transition">
-                    <td class="p-4 font-medium text-stone-900 flex items-center space-x-3">
-                        <img src="${p.main_image || (p.images && p.images[0]) || 'https://via.placeholder.com/40'}" class="w-12 h-12 rounded-lg object-cover border border-stone-200">
-                        <span>${p.name}</span>
-                    </td>
-                    <td class="p-4 text-stone-600">${p.category || '-'}</td>
-                    <td class="p-4 font-medium text-stone-900">$ ${Number(p.price).toFixed(2)}</td>
+                <tr class="hover:bg-stone-50">
                     <td class="p-4">
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${p.status === 'vendido' ? 'bg-red-100 text-red-700' : p.status === 'reservado' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
-                            ${p.status}
-                        </span>
+                        <div class="flex items-center space-x-3">
+                            <img src="${esc(p.main_image || (p.images && p.images[0]) || 'https://via.placeholder.com/40')}" alt="" class="w-12 h-12 rounded-md object-cover border border-stone-200">
+                            <span class="font-medium">${esc(p.name)}</span>
+                        </div>
                     </td>
-                    <td class="p-4 text-right space-x-2">
-                        ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${p.id}')" class="text-emerald-700 hover:text-emerald-900 font-medium text-xs px-3 py-1.5 border border-emerald-200 rounded-lg hover:bg-emerald-50 transition">Marcar vendido</button>` : ''}
-                        <button onclick="editarProducto('${p.id}')" class="text-stone-700 hover:text-stone-900 font-medium text-xs px-3 py-1.5 border border-stone-200 rounded-lg hover:bg-white transition">Editar</button>
-                        <button onclick="eliminarProducto('${p.id}')" class="text-red-600 hover:text-red-800 font-medium text-xs px-3 py-1.5 border border-red-200 rounded-lg hover:bg-red-50 transition">Eliminar</button>
+                    <td class="p-4 text-stone-600">${esc(p.category || '-')}</td>
+                    <td class="p-4 font-medium">$ ${Number(p.price).toFixed(2)}</td>
+                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-md ${p.status === 'vendido' ? 'bg-stone-900 text-white' : p.status === 'reservado' ? 'bg-stone-200 text-stone-800' : 'bg-stone-100 text-stone-600'}">${esc(p.status)}</span></td>
+                    <td class="p-4 text-right space-x-2 whitespace-nowrap">
+                        ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${esc(p.id)}')" class="text-xs px-3 py-1.5 border border-stone-300 rounded-md hover:bg-stone-50">Marcar vendido</button>` : ''}
+                        <button onclick="editarProducto('${esc(p.id)}')" class="text-xs px-3 py-1.5 border border-stone-300 rounded-md hover:bg-stone-50">Editar</button>
+                        <button onclick="eliminarProducto('${esc(p.id)}')" class="text-xs px-3 py-1.5 border border-stone-300 text-red-600 rounded-md hover:bg-red-50">Eliminar</button>
                     </td>
                 </tr>
             `).join('');
@@ -447,119 +417,108 @@
 
         async function marcarComoVendido(id) {
             const { error } = await supabaseClient.from('products').update({ status: 'vendido' }).eq('id', id);
-            if (!error) {
-                await supabaseClient.from('sales').insert([{
-                    product_id: id,
-                    sale_price: 0,
-                    status: 'completada',
-                    observations: 'Marcado como vendido desde acción rápida'
-                }]);
-                cargarInventarioAdmin();
-                cargarVentasAdmin();
-            } else {
-                alert('Error al actualizar estado: ' + error.message);
-            }
+            if (error) { alert('No se pudo actualizar el estado: ' + error.message); return; }
+            await supabaseClient.from('sales').insert([{
+                product_id: id,
+                sale_price: 0,
+                status: 'completada',
+                observations: 'Marcado como vendido desde acción rápida'
+            }]);
+            cargarInventarioAdmin();
+            cargarVentasAdmin();
         }
 
         async function cargarVentasAdmin() {
-            const tbody = document.getElementById('tabla-ventas-body');
+            const tbody = $('tabla-ventas-body');
             const { data } = await supabaseClient.from('sales').select('*, products(name)').order('created_at', { ascending: false });
-            
             if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-stone-400">No hay ventas registradas.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-stone-400">Aún no hay ventas registradas.</td></tr>';
                 return;
             }
-
             tbody.innerHTML = data.map(v => `
-                <tr class="hover:bg-stone-50/80 transition">
+                <tr class="hover:bg-stone-50">
                     <td class="p-4 text-stone-600">${new Date(v.created_at).toLocaleDateString()}</td>
-                    <td class="p-4 font-medium text-stone-900">${v.products?.name || 'Pieza eliminada'}</td>
-                    <td class="p-4 font-medium text-stone-900">$ ${Number(v.sale_price).toFixed(2)}</td>
-                    <td class="p-4"><span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold uppercase">${v.status}</span></td>
+                    <td class="p-4 font-medium">${esc(v.products?.name || 'Pieza eliminada')}</td>
+                    <td class="p-4 font-medium">$ ${Number(v.sale_price).toFixed(2)}</td>
+                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-md bg-stone-100 text-stone-600">${esc(v.status)}</span></td>
                 </tr>
             `).join('');
         }
 
         function abrirModalProducto() {
-            document.getElementById('modal-titulo').innerText = 'Nuevo Producto';
-            document.getElementById('form-producto').reset();
-            document.getElementById('prod-id').value = '';
-            document.getElementById('btn-guardar-prod').disabled = false;
-            document.getElementById('btn-guardar-prod').innerText = 'Guardar Producto';
-            document.getElementById('modal-producto').classList.remove('hidden');
-            document.getElementById('modal-producto').classList.add('flex');
+            $('modal-titulo').innerText = 'Nuevo producto';
+            $('form-producto').reset();
+            $('prod-id').value = '';
+            $('btn-guardar-prod').disabled = false;
+            $('btn-guardar-prod').innerText = 'Guardar producto';
+            $('modal-producto').classList.remove('hidden');
+            $('modal-producto').classList.add('flex');
         }
-
         function cerrarModalProducto() {
-            document.getElementById('modal-producto').classList.add('hidden');
-            document.getElementById('modal-producto').classList.remove('flex');
+            $('modal-producto').classList.add('hidden');
+            $('modal-producto').classList.remove('flex');
         }
 
-        // GUARDADO ROBUSTO Y SEGURO (Sube fotos una por una sin bloquearse jamás)
+        // GUARDADO: ahora todo va dentro de try/catch/finally, así el botón
+        // nunca se queda trabado aunque algo falle.
         async function guardarProducto(e) {
             e.preventDefault();
-            const btnGuardar = document.getElementById('btn-guardar-prod');
-            btnGuardar.disabled = true;
+            const btn = $('btn-guardar-prod');
+            btn.disabled = true;
+            btn.innerText = 'Guardando…';
 
-            const id = document.getElementById('prod-id').value;
-            const name = document.getElementById('prod-nombre').value;
-            const category = document.getElementById('prod-categoria').value;
-            const price = parseFloat(document.getElementById('prod-precio').value);
-            const collection_name = document.getElementById('prod-coleccion').value || 'General';
-            const description = document.getElementById('prod-descripcion').value;
-            const status = document.getElementById('prod-estado').value;
-            const fileInput = document.getElementById('prod-fotos');
+            try {
+                const id = $('prod-id').value;
+                const productoData = {
+                    name: $('prod-nombre').value.trim(),
+                    category: $('prod-categoria').value.trim(),
+                    price: parseFloat($('prod-precio').value),
+                    collection_name: ($('prod-coleccion').value || '').trim() || 'General',
+                    description: $('prod-descripcion').value.trim(),
+                    status: $('prod-estado').value
+                };
 
-            let imageUrls = [];
-            if (fileInput.files.length > 0) {
-                let totalFotos = fileInput.files.length;
-                for (let i = 0; i < totalFotos; i++) {
-                    let file = fileInput.files[i];
-                    btnGuardar.innerText = `Subiendo ${i + 1} de ${totalFotos}...`;
-                    const filePath = `uploads/${Date.now()}_${Math.random().toString(36).substring(2)}_${file.name}`;
-                    
-                    try {
-                        const { data, error } = await supabaseClient.storage.from('productos').upload(filePath, file);
-                        if (!error) {
-                            const { data: publicURL } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
-                            if (publicURL && publicURL.publicUrl) {
-                                imageUrls.push(publicURL.publicUrl);
-                            }
-                        }
-                    } catch (err) {
-                        console.error("Error al subir archivo:", err);
-                    }
+                // Subida de fotos, una por una
+                const files = $('prod-fotos').files;
+                const imageUrls = [];
+                const fallos = [];
+                for (let i = 0; i < files.length; i++) {
+                    btn.innerText = `Subiendo foto ${i + 1} de ${files.length}…`;
+                    const file = files[i];
+                    const limpio = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                    const filePath = `uploads/${Date.now()}_${Math.random().toString(36).slice(2)}_${limpio}`;
+                    const { error: upErr } = await supabaseClient.storage.from('productos').upload(filePath, file);
+                    if (upErr) { fallos.push(`${file.name}: ${upErr.message}`); continue; }
+                    const { data: pub } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
+                    if (pub && pub.publicUrl) imageUrls.push(pub.publicUrl);
                 }
-            }
 
-            const productoData = { name, category, price, collection_name, description, status };
-            if (imageUrls.length > 0) {
-                productoData.images = imageUrls;
-                productoData.main_image = imageUrls[0];
-            }
-
-            btnGuardar.innerText = 'Guardando en base de datos...';
-            let error;
-            if (id) {
-                if (imageUrls.length === 0) {
-                    delete productoData.images;
-                    delete productoData.main_image;
+                if (fallos.length > 0) {
+                    const seguir = confirm(`No se pudieron subir ${fallos.length} foto(s):\n\n${fallos.join('\n')}\n\n¿Guardar el producto de todos modos?`);
+                    if (!seguir) return;
                 }
-                const res = await supabaseClient.from('products').update(productoData).eq('id', id);
-                error = res.error;
-            } else {
-                const res = await supabaseClient.from('products').insert([productoData]);
-                error = res.error;
-            }
 
-            if (error) {
-                alert('Error al guardar: ' + error.message);
-                btnGuardar.disabled = false;
-                btnGuardar.innerText = 'Guardar Producto';
-            } else {
+                if (imageUrls.length > 0) {
+                    productoData.images = imageUrls;
+                    productoData.main_image = imageUrls[0];
+                }
+
+                btn.innerText = 'Guardando…';
+                const res = id
+                    ? await supabaseClient.from('products').update(productoData).eq('id', id)
+                    : await supabaseClient.from('products').insert([productoData]);
+
+                if (res.error) throw res.error;
+
                 cerrarModalProducto();
                 cargarInventarioAdmin();
                 cargarCatalogoPublico();
+            } catch (err) {
+                console.error(err);
+                alert('No se pudo guardar: ' + (err.message || err));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = $('prod-id').value ? 'Guardar cambios' : 'Guardar producto';
             }
         }
 
@@ -567,32 +526,28 @@
             const { data } = await supabaseClient.from('products').select('*').eq('id', id).single();
             if (!data) return;
 
-            document.getElementById('modal-titulo').innerText = 'Editar Producto';
-            document.getElementById('prod-id').value = data.id;
-            document.getElementById('prod-nombre').value = data.name;
-            document.getElementById('prod-categoria').value = data.category || '';
-            document.getElementById('prod-precio').value = data.price;
-            document.getElementById('prod-coleccion').value = data.collection_name || '';
-            document.getElementById('prod-descripcion').value = data.description || '';
-            document.getElementById('prod-estado').value = data.status;
+            $('modal-titulo').innerText = 'Editar producto';
+            $('prod-id').value = data.id;
+            $('prod-nombre').value = data.name;
+            $('prod-categoria').value = data.category || '';
+            $('prod-precio').value = data.price;
+            $('prod-coleccion').value = data.collection_name || '';
+            $('prod-descripcion').value = data.description || '';
+            $('prod-estado').value = data.status;
+            $('prod-fotos').value = '';
 
-            document.getElementById('btn-guardar-prod').disabled = false;
-            document.getElementById('btn-guardar-prod').innerText = 'Guardar Cambios';
-
-            document.getElementById('modal-producto').classList.remove('hidden');
-            document.getElementById('modal-producto').classList.add('flex');
+            $('btn-guardar-prod').disabled = false;
+            $('btn-guardar-prod').innerText = 'Guardar cambios';
+            $('modal-producto').classList.remove('hidden');
+            $('modal-producto').classList.add('flex');
         }
 
         async function eliminarProducto(id) {
-            if (confirm('¿Estás seguro de eliminar este producto del inventario?')) {
-                const { error } = await supabaseClient.from('products').delete().eq('id', id);
-                if (error) {
-                    alert('Error al eliminar: ' + error.message);
-                } else {
-                    cargarInventarioAdmin();
-                    cargarCatalogoPublico();
-                }
-            }
+            if (!confirm('¿Eliminar este producto del inventario?')) return;
+            const { error } = await supabaseClient.from('products').delete().eq('id', id);
+            if (error) { alert('No se pudo eliminar: ' + error.message); return; }
+            cargarInventarioAdmin();
+            cargarCatalogoPublico();
         }
     </script>
 </body>
