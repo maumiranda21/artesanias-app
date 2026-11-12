@@ -6,7 +6,8 @@
     <title>creatiyés | Catálogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { theme: { extend: { colors: { cream: { 50: '#fdfaf2', 100: '#f8f3e7', 200: '#eee6d2' } } } } };
+        // Paleta base (gris cálido neutro). Cambia estos 4 valores para cambiar todo el sitio.
+        tailwind.config = { theme: { extend: { colors: { base: { 50: '#f8f8f7', 100: '#efeeec', 200: '#e3e1de', 300: '#d3d0cb' } } } } };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,20 +15,43 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             letter-spacing: -0.01em;
-            background-color: #f8f3e7;
-            background-image: radial-gradient(rgba(120, 100, 70, 0.22) 1px, transparent 1px);
+            background-color: #efeeec;
+            background-image: radial-gradient(rgba(70, 65, 60, 0.16) 1px, transparent 1px);
             background-size: 18px 18px;
         }
         h1, h2, h3, h4 { line-height: 1.15; }
         .fade-in { animation: fadeIn 0.25s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        /* Efecto blur al pasar el mouse por los botones */
-        .fx { transition: background-color .25s ease, backdrop-filter .25s ease, -webkit-backdrop-filter .25s ease, box-shadow .25s ease, color .25s ease; }
-        .fx:not(:disabled):hover { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(28, 25, 23, 0.12); }
-        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #1c1917; outline-offset: 2px; }
-        .pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+        .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+
+        /* Botones: relleno sólido por defecto, blur al pasar el mouse */
+        .btn, .chip, .icon-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+            font-weight: 500; font-size: .875rem; line-height: 1; cursor: pointer;
+            transition: background-color .25s ease, backdrop-filter .25s ease, -webkit-backdrop-filter .25s ease, box-shadow .25s ease;
+        }
+        .btn { padding: .65rem 1.1rem; border-radius: .6rem; border: 1px solid transparent; }
+        .btn-sm { padding: .45rem .75rem; font-size: .75rem; }
+        .btn-primary { background: #1c1917; color: #f8f8f7; }
+        .btn-secondary { background: #e3e1de; color: #1c1917; border-color: #cdcac4; }
+        .btn-danger { background: #f1dedc; color: #9b1c1c; border-color: #e2bdb9; }
+        .chip { padding: .5rem 1rem; border-radius: 9999px; background: #f8f8f7; color: #44403c; border: 1px solid #cdcac4; white-space: nowrap; }
+        .chip-on { background: #1c1917; color: #f8f8f7; border-color: #1c1917; }
+        .icon-btn { width: 2.5rem; height: 2.5rem; border-radius: 9999px; background: #f8f8f7; color: #1c1917; border: 1px solid #cdcac4; }
+        .btn-primary:not(:disabled):hover, .chip-on:hover { background: rgba(28, 25, 23, .82); }
+        .btn-secondary:not(:disabled):hover { background: rgba(227, 225, 222, .72); }
+        .btn-danger:not(:disabled):hover { background: rgba(241, 222, 220, .72); }
+        .chip:not(.chip-on):hover, .icon-btn:hover { background: rgba(248, 248, 247, .72); }
+        .btn:not(:disabled):hover, .chip:hover, .icon-btn:hover {
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(28, 25, 23, .14);
+        }
+        .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, label:focus-within { outline: 2px solid #1c1917; outline-offset: 2px; }
         #filtros-categorias { scrollbar-width: none; }
         #filtros-categorias::-webkit-scrollbar { display: none; }
+        .field { width: 100%; padding: .65rem .75rem; border-radius: .5rem; border: 1px solid #cdcac4; background: #f8f8f7; }
+        .field:focus { border-color: #1c1917; outline: none; }
         @media (prefers-reduced-motion: reduce) {
             .fade-in { animation: none; }
             .track { transition: none !important; }
@@ -37,29 +61,29 @@
 <body class="text-stone-900 min-h-screen">
 
     <!-- Header -->
-    <header class="sticky top-0 z-30 bg-cream-50/90 backdrop-blur border-b border-stone-300">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+    <header class="sticky top-0 z-30 bg-base-300 border-b border-stone-400/60">
+        <div class="max-w-[1400px] mx-auto px-5 py-5 flex items-center gap-6">
             <div class="cursor-pointer shrink-0" onclick="cambiarVista('catalogo')">
-                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-11 sm:h-14 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
+                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-9 sm:h-12 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
             </div>
             <!-- Categorías a la derecha -->
-            <div id="filtros-categorias" class="flex-1 flex justify-end gap-x-5 overflow-x-auto whitespace-nowrap"></div>
+            <div id="filtros-categorias" class="flex-1 flex justify-end gap-2 overflow-x-auto"></div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 pt-10 pb-28">
+    <main class="max-w-[1400px] mx-auto px-5 pt-10 pb-36">
 
         <!-- CATÁLOGO PÚBLICO -->
         <section id="vista-catalogo" class="fade-in">
-            <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-                <div class="col-span-full text-center py-16 text-stone-400 text-sm">Cargando piezas…</div>
+            <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+                <div class="col-span-full text-center py-16 text-stone-500 text-sm">Cargando piezas…</div>
             </div>
         </section>
 
         <!-- PANEL ADMIN -->
         <section id="vista-admin" class="hidden space-y-8 fade-in">
             <!-- Login -->
-            <div id="admin-login" class="max-w-sm mx-auto pt-6 space-y-6">
+            <div id="admin-login" class="max-w-sm mx-auto bg-base-50 border border-base-300 rounded-xl p-7 space-y-6">
                 <div class="text-center space-y-1">
                     <h2 class="text-xl font-semibold">Acceso administrador</h2>
                     <p class="text-sm text-stone-500">Ingresa con tu correo y contraseña.</p>
@@ -67,29 +91,29 @@
                 <form onsubmit="iniciarSesionAdmin(event)" class="space-y-4">
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="login-email">Correo electrónico</label>
-                        <input type="email" id="login-email" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                        <input type="email" id="login-email" required class="field">
                     </div>
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="login-password">Contraseña</label>
-                        <input type="password" id="login-password" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                        <input type="password" id="login-password" required class="field">
                     </div>
-                    <button type="submit" class="fx w-full py-3 bg-stone-900/90 text-cream-50 text-sm font-medium rounded-md hover:bg-stone-900/75">Iniciar sesión</button>
+                    <button type="submit" class="btn btn-primary w-full">Iniciar sesión</button>
                 </form>
             </div>
 
             <!-- Dashboard -->
             <div id="admin-dashboard" class="hidden space-y-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-stone-300">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-stone-400/50">
                     <div>
                         <h2 class="text-xl font-semibold">Panel de control</h2>
                         <p class="text-sm text-stone-500" id="admin-user-email"></p>
                     </div>
-                    <button onclick="cerrarSesionAdmin()" class="fx px-4 py-2 text-sm border border-stone-400 rounded-md hover:bg-cream-50/60">Cerrar sesión</button>
+                    <button onclick="cerrarSesionAdmin()" class="btn btn-secondary"><span data-icon="logout"></span>Cerrar sesión</button>
                 </div>
 
-                <div class="flex space-x-6 border-b border-stone-300">
+                <div class="flex space-x-6 border-b border-stone-400/50">
                     <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-3 -mb-px border-b-2 border-stone-900 font-semibold text-sm">Inventario</button>
-                    <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 -mb-px border-b-2 border-transparent text-stone-500 hover:text-stone-900 text-sm">Ventas</button>
+                    <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 -mb-px border-b-2 border-transparent text-stone-600 hover:text-stone-900 text-sm">Ventas</button>
                 </div>
 
                 <!-- Inventario -->
@@ -97,15 +121,15 @@
                     <div class="flex flex-wrap justify-between items-center gap-3">
                         <h3 class="text-base font-semibold">Inventario</h3>
                         <div class="flex flex-wrap gap-2">
-                            <button id="btn-sel-todos" onclick="alternarSeleccionTodos()" class="fx px-4 py-2 text-sm border border-stone-400 rounded-md hover:bg-cream-50/60">Seleccionar todos</button>
-                            <button id="btn-editar-masivo" onclick="abrirModalMasivo()" class="fx hidden px-4 py-2 text-sm font-medium bg-stone-900/90 text-cream-50 rounded-md hover:bg-stone-900/75">Editar selección</button>
-                            <button onclick="abrirModalProducto()" class="fx px-4 py-2 bg-stone-900/90 text-cream-50 text-sm font-medium rounded-md hover:bg-stone-900/75">Nuevo producto</button>
+                            <button id="btn-sel-todos" onclick="alternarSeleccionTodos()" class="btn btn-secondary"><span data-icon="checksquare"></span><span id="lbl-sel-todos">Seleccionar todos</span></button>
+                            <button id="btn-editar-masivo" onclick="abrirModalMasivo()" class="btn btn-primary hidden"><span data-icon="pencil"></span><span id="lbl-editar-masivo">Editar selección</span></button>
+                            <button onclick="abrirModalProducto()" class="btn btn-primary"><span data-icon="plus"></span>Nuevo producto</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto border border-stone-300 rounded-md bg-cream-50">
-                        <table class="w-full text-left border-collapse min-w-[700px]">
+                    <div class="overflow-x-auto border border-base-300 rounded-xl bg-base-50">
+                        <table class="w-full text-left border-collapse min-w-[760px]">
                             <thead>
-                                <tr class="border-b border-stone-300 text-xs text-stone-500">
+                                <tr class="border-b border-base-300 text-xs text-stone-500">
                                     <th class="p-4 w-10"><input type="checkbox" id="chk-todos" class="accent-stone-900 w-4 h-4" aria-label="Seleccionar todos"></th>
                                     <th class="p-4 font-medium">Pieza</th>
                                     <th class="p-4 font-medium">Categoría</th>
@@ -114,7 +138,7 @@
                                     <th class="p-4 font-medium text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-inventario-body" class="divide-y divide-stone-200 text-sm"></tbody>
+                            <tbody id="tabla-inventario-body" class="divide-y divide-base-200 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -122,17 +146,17 @@
                 <!-- Ventas -->
                 <div id="panel-ventas" class="hidden space-y-4">
                     <h3 class="text-base font-semibold">Registro de ventas</h3>
-                    <div class="overflow-x-auto border border-stone-300 rounded-md bg-cream-50">
+                    <div class="overflow-x-auto border border-base-300 rounded-xl bg-base-50">
                         <table class="w-full text-left border-collapse min-w-[480px]">
                             <thead>
-                                <tr class="border-b border-stone-300 text-xs text-stone-500">
+                                <tr class="border-b border-base-300 text-xs text-stone-500">
                                     <th class="p-4 font-medium">Fecha</th>
                                     <th class="p-4 font-medium">Producto</th>
                                     <th class="p-4 font-medium">Precio final</th>
                                     <th class="p-4 font-medium">Estado</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-ventas-body" class="divide-y divide-stone-200 text-sm"></tbody>
+                            <tbody id="tabla-ventas-body" class="divide-y divide-base-200 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -141,65 +165,68 @@
     </main>
 
     <!-- Navegación inferior -->
-    <nav class="fixed bottom-0 inset-x-0 z-40 bg-cream-50/90 backdrop-blur border-t border-stone-300 pt-3 pb-safe">
-        <div class="flex justify-center space-x-10">
-            <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="text-sm font-semibold text-stone-900 border-b-2 border-stone-900 pb-1">Catálogo</button>
-            <button onclick="cambiarVista('admin')" id="btn-admin" class="text-sm font-medium text-stone-500 border-b-2 border-transparent pb-1 hover:text-stone-900">Panel</button>
+    <nav class="fixed bottom-0 inset-x-0 z-40 bg-base-300 border-t border-stone-400/60 pt-4 pb-safe">
+        <div class="flex justify-center gap-3">
+            <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="chip chip-on"><span data-icon="grid"></span>Catálogo</button>
+            <button onclick="cambiarVista('admin')" id="btn-admin" class="chip"><span data-icon="sliders"></span>Panel</button>
         </div>
     </nav>
 
     <!-- Modal producto -->
-    <div id="modal-producto" class="fixed inset-0 bg-stone-900/40 hidden items-center justify-center z-50 p-4">
-        <div class="bg-cream-50 w-full max-w-lg rounded-lg p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+    <div id="modal-producto" class="fixed inset-0 bg-stone-900/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-base-50 w-full max-w-lg rounded-xl p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <h3 id="modal-titulo" class="text-lg font-semibold">Nuevo producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
                 <div>
-                    <label class="block text-sm text-stone-600 mb-1" for="prod-fotos">Fotografías</label>
-                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="analizarNombreArchivoIA(event)" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-cream-200 file:text-stone-700 hover:file:bg-stone-200">
-                    <p id="ia-estado" class="text-xs text-stone-400 mt-1.5 hidden">Leyendo nombre de archivo…</p>
+                    <span class="block text-sm text-stone-600 mb-1">Fotografías</span>
+                    <label for="prod-fotos" class="btn btn-secondary w-full"><span data-icon="upload"></span>Agregar fotos</label>
+                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="agregarFotosEditor(event)" class="sr-only">
+                    <p id="ia-estado" class="text-xs text-stone-500 mt-1.5 hidden">Leyendo nombre de archivo…</p>
+                    <div id="editor-fotos" class="grid grid-cols-4 gap-2 mt-3"></div>
+                    <p id="editor-ayuda" class="text-xs text-stone-500 mt-2 hidden">Toca una foto para marcarla como principal. Esa es la que se verá primero en la tarjeta.</p>
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-nombre">Nombre</label>
-                    <input type="text" id="prod-nombre" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                    <input type="text" id="prod-nombre" required class="field">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="prod-categoria">Categoría</label>
-                        <input type="text" id="prod-categoria" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                        <input type="text" id="prod-categoria" required class="field">
                     </div>
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="prod-precio">Precio (S/)</label>
-                        <input type="number" step="0.01" id="prod-precio" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                        <input type="number" step="0.01" id="prod-precio" required class="field">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-coleccion">Colección (opcional)</label>
-                    <input type="text" id="prod-coleccion" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                    <input type="text" id="prod-coleccion" class="field">
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-descripcion">Descripción</label>
-                    <textarea id="prod-descripcion" rows="3" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none"></textarea>
+                    <textarea id="prod-descripcion" rows="3" class="field"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-estado">Estado</label>
-                    <select id="prod-estado" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                    <select id="prod-estado" class="field">
                         <option value="disponible">Disponible</option>
                         <option value="reservado">Reservado</option>
                         <option value="vendido">Vendido</option>
                     </select>
                 </div>
-                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
-                    <button type="button" onclick="cerrarModalProducto()" class="fx px-5 py-2.5 border border-stone-400 rounded-md text-sm text-stone-600 hover:bg-cream-200/60">Cancelar</button>
-                    <button type="submit" id="btn-guardar-prod" class="fx px-6 py-2.5 bg-stone-900/90 text-cream-50 rounded-md text-sm font-medium hover:bg-stone-900/75 disabled:opacity-60">Guardar producto</button>
+                <div class="flex justify-end gap-3 pt-4 border-t border-base-300">
+                    <button type="button" onclick="cerrarModalProducto()" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="btn-guardar-prod" class="btn btn-primary">Guardar producto</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modal edición en masa -->
-    <div id="modal-masivo" class="fixed inset-0 bg-stone-900/40 hidden items-center justify-center z-50 p-4">
-        <div class="bg-cream-50 w-full max-w-lg rounded-lg p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+    <div id="modal-masivo" class="fixed inset-0 bg-stone-900/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-base-50 w-full max-w-lg rounded-xl p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <div class="space-y-1">
                 <h3 id="masivo-titulo" class="text-lg font-semibold">Editar selección</h3>
                 <p class="text-sm text-stone-500">Se aplicará a todos los productos seleccionados. Los campos que dejes vacíos no se modifican.</p>
@@ -208,33 +235,33 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="mas-categoria">Categoría</label>
-                        <input type="text" id="mas-categoria" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                        <input type="text" id="mas-categoria" class="field">
                     </div>
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="mas-precio">Precio (S/)</label>
-                        <input type="number" step="0.01" id="mas-precio" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                        <input type="number" step="0.01" id="mas-precio" class="field">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="mas-coleccion">Colección</label>
-                    <input type="text" id="mas-coleccion" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                    <input type="text" id="mas-coleccion" class="field">
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="mas-descripcion">Descripción</label>
-                    <textarea id="mas-descripcion" rows="3" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none"></textarea>
+                    <textarea id="mas-descripcion" rows="3" class="field"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="mas-estado">Estado</label>
-                    <select id="mas-estado" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                    <select id="mas-estado" class="field">
                         <option value="">No cambiar</option>
                         <option value="disponible">Disponible</option>
                         <option value="reservado">Reservado</option>
                         <option value="vendido">Vendido</option>
                     </select>
                 </div>
-                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
-                    <button type="button" onclick="cerrarModalMasivo()" class="fx px-5 py-2.5 border border-stone-400 rounded-md text-sm text-stone-600 hover:bg-cream-200/60">Cancelar</button>
-                    <button type="submit" id="btn-guardar-masivo" class="fx px-6 py-2.5 bg-stone-900/90 text-cream-50 rounded-md text-sm font-medium hover:bg-stone-900/75 disabled:opacity-60">Aplicar cambios</button>
+                <div class="flex justify-end gap-3 pt-4 border-t border-base-300">
+                    <button type="button" onclick="cerrarModalMasivo()" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="btn-guardar-masivo" class="btn btn-primary">Aplicar cambios</button>
                 </div>
             </form>
         </div>
@@ -242,26 +269,52 @@
 
     <!-- Zoom de imagen -->
     <div id="modal-zoom" class="fixed inset-0 bg-stone-900/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
-        <button onclick="cerrarZoom()" aria-label="Cerrar imagen" class="fx fixed top-4 right-4 w-11 h-11 rounded-full bg-cream-50 text-stone-900 border border-stone-300 text-2xl leading-none flex items-center justify-center shadow-md hover:bg-cream-50/70">×</button>
-        <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[80vh] rounded-md object-contain" onclick="event.stopPropagation()">
-        <p class="fixed bottom-6 inset-x-0 text-center text-sm text-cream-100">Presiona Esc o toca afuera para cerrar</p>
+        <button onclick="cerrarZoom()" aria-label="Cerrar imagen" class="icon-btn fixed top-4 right-4 w-11 h-11 shadow-md"><span data-icon="x" data-cls="w-5 h-5"></span></button>
+        <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[80vh] rounded-lg object-contain" onclick="event.stopPropagation()">
+        <p class="fixed bottom-6 inset-x-0 text-center text-sm text-base-100">Presiona Esc o toca afuera para cerrar</p>
     </div>
 
     <script>
+        /* ---------- Iconos (estilo Lucide, SVG en línea) ---------- */
+        const ICONS = {
+            left: '<path d="m15 18-6-6 6-6"/>',
+            right: '<path d="m9 18 6-6-6-6"/>',
+            x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+            star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+            chat: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+            grid: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+            sliders: '<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
+            plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+            pencil: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>',
+            trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>',
+            check: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/>',
+            checksquare: '<path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+            upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+            logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+            zoom: '<circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/>'
+        };
+        const icon = (name, cls = 'w-4 h-4', relleno = false) =>
+            `<svg class="${cls} shrink-0" viewBox="0 0 24 24" fill="${relleno ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+        document.querySelectorAll('[data-icon]').forEach(el => {
+            el.outerHTML = icon(el.dataset.icon, el.dataset.cls || 'w-4 h-4');
+        });
+
+        /* ---------- Configuración ---------- */
         const SUPABASE_URL = 'https://mprojuxphdxyvghqoynv.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OVwdEUSZNt9en94i-g-Ulw_QuwLT901';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ⚠️ Escribe aquí tu número de WhatsApp con código de país y sin "+" ni espacios.
-        // Ejemplo Perú: '51987654321'. Mientras tenga las X, se usa el enlace wa.link (sin mensaje automático).
         const WHATSAPP_NUMERO = '51956763529';
-        const WHATSAPP_LINK_RESPALDO = 'https://wa.link/3qk34n';
 
         let productosGlobal = [];
         let inventarioGlobal = [];
         let categoriaActual = 'todos';
         let carruselIndices = {};
         const seleccionados = new Set();
+
+        // Editor de fotos del producto
+        let fotosEditor = [];   // { url?, file?, preview }
+        let principalIdx = 0;
 
         const $ = (id) => document.getElementById(id);
         const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -271,6 +324,7 @@
             verificarSesionReal();
             cargarCatalogoPublico();
             configurarEventosCatalogo();
+            configurarEventosEditorFotos();
         });
 
         document.addEventListener('keydown', (e) => {
@@ -313,23 +367,13 @@
         }
 
         function cambiarVista(vista) {
-            const activo = 'text-sm font-semibold text-stone-900 border-b-2 border-stone-900 pb-1';
-            const inactivo = 'text-sm font-medium text-stone-500 border-b-2 border-transparent pb-1 hover:text-stone-900';
-            if (vista === 'catalogo') {
-                $('vista-catalogo').classList.remove('hidden');
-                $('vista-admin').classList.add('hidden');
-                $('filtros-categorias').classList.remove('hidden');
-                $('btn-catalogo').className = activo;
-                $('btn-admin').className = inactivo;
-                cargarCatalogoPublico();
-            } else {
-                $('vista-catalogo').classList.add('hidden');
-                $('vista-admin').classList.remove('hidden');
-                $('filtros-categorias').classList.add('hidden');
-                $('btn-admin').className = activo;
-                $('btn-catalogo').className = inactivo;
-                verificarSesionReal();
-            }
+            const enCatalogo = vista === 'catalogo';
+            $('vista-catalogo').classList.toggle('hidden', !enCatalogo);
+            $('vista-admin').classList.toggle('hidden', enCatalogo);
+            $('filtros-categorias').classList.toggle('hidden', !enCatalogo);
+            $('btn-catalogo').className = 'chip' + (enCatalogo ? ' chip-on' : '');
+            $('btn-admin').className = 'chip' + (enCatalogo ? '' : ' chip-on');
+            if (enCatalogo) cargarCatalogoPublico(); else verificarSesionReal();
             window.scrollTo({ top: 0 });
         }
 
@@ -338,7 +382,7 @@
             const grid = $('grid-productos');
             const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
             if (error) {
-                grid.innerHTML = `<div class="col-span-full text-center py-16 text-red-600 text-sm">No se pudieron cargar los productos: ${esc(error.message)}</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-16 text-red-700 text-sm">No se pudieron cargar los productos: ${esc(error.message)}</div>`;
                 return;
             }
             productosGlobal = data || [];
@@ -350,7 +394,7 @@
             const categorias = ['todos', ...new Set(productosGlobal.map(p => p.category).filter(Boolean))];
             const cont = $('filtros-categorias');
             cont.innerHTML = categorias.map(cat => `
-                <button data-cat="${esc(cat)}" class="text-sm pb-1 border-b-2 ${categoriaActual === cat ? 'border-stone-900 text-stone-900 font-semibold' : 'border-transparent text-stone-500 hover:text-stone-900'}">
+                <button data-cat="${esc(cat)}" class="chip ${categoriaActual === cat ? 'chip-on' : ''}">
                     ${esc(cat === 'todos' ? 'Todas' : cat.charAt(0).toUpperCase() + cat.slice(1))}
                 </button>
             `).join('');
@@ -363,10 +407,15 @@
             renderizarProductos();
         }
 
+        // Fotos reales del producto, con la principal siempre primero
+        function fotosReales(p) {
+            let arr = Array.isArray(p.images) ? p.images.filter(Boolean) : [];
+            if (p.main_image) arr = [p.main_image, ...arr.filter(u => u !== p.main_image)];
+            return arr;
+        }
         function fotosDe(p) {
-            if (Array.isArray(p.images) && p.images.length > 0) return p.images;
-            if (p.main_image) return [p.main_image];
-            return ['https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=800&q=80'];
+            const arr = fotosReales(p);
+            return arr.length ? arr : ['https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=800&q=80'];
         }
 
         function renderizarProductos() {
@@ -374,7 +423,7 @@
             const filtrados = categoriaActual === 'todos' ? productosGlobal : productosGlobal.filter(p => p.category === categoriaActual);
 
             if (filtrados.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-16 text-stone-400 text-sm">No hay piezas en esta categoría.</div>';
+                grid.innerHTML = '<div class="col-span-full text-center py-16 text-stone-500 text-sm">No hay piezas en esta categoría.</div>';
                 return;
             }
 
@@ -384,31 +433,31 @@
                 if (idx >= fotos.length) idx = 0;
                 carruselIndices[p.id] = idx;
 
-                const badge = p.status === 'vendido' ? '<span class="absolute top-3 left-3 z-10 bg-cream-50 text-stone-900 text-xs font-medium px-2.5 py-1 rounded-md">Vendido</span>'
-                            : p.status === 'reservado' ? '<span class="absolute top-3 left-3 z-10 bg-cream-50 text-stone-900 text-xs font-medium px-2.5 py-1 rounded-md">Reservado</span>' : '';
+                const badge = p.status === 'vendido' || p.status === 'reservado'
+                    ? `<span class="absolute top-3 left-3 z-10 bg-base-50 text-stone-900 text-xs font-medium px-3 py-1.5 rounded-full border border-base-300">${p.status === 'vendido' ? 'Vendido' : 'Reservado'}</span>` : '';
 
                 const controles = fotos.length > 1 ? `
-                    <button data-prev="${esc(p.id)}" aria-label="Foto anterior" class="fx absolute left-2 top-1/2 -translate-y-1/2 bg-cream-50/85 hover:bg-cream-50/60 text-stone-900 w-9 h-9 rounded-full flex items-center justify-center z-10 text-lg">‹</button>
-                    <button data-next="${esc(p.id)}" aria-label="Foto siguiente" class="fx absolute right-2 top-1/2 -translate-y-1/2 bg-cream-50/85 hover:bg-cream-50/60 text-stone-900 w-9 h-9 rounded-full flex items-center justify-center z-10 text-lg">›</button>
-                    <div id="cnt-${esc(p.id)}" class="absolute bottom-3 right-3 bg-cream-50/90 text-stone-900 text-xs px-2 py-0.5 rounded-md z-10">${idx + 1}/${fotos.length}</div>` : '';
+                    <button data-prev="${esc(p.id)}" aria-label="Foto anterior" class="icon-btn absolute left-3 top-1/2 -translate-y-1/2 z-10">${icon('left', 'w-5 h-5')}</button>
+                    <button data-next="${esc(p.id)}" aria-label="Foto siguiente" class="icon-btn absolute right-3 top-1/2 -translate-y-1/2 z-10">${icon('right', 'w-5 h-5')}</button>
+                    <div id="cnt-${esc(p.id)}" class="absolute bottom-3 right-3 bg-base-50 text-stone-900 text-xs font-medium px-2.5 py-1 rounded-full border border-base-300 z-10">${idx + 1}/${fotos.length}</div>` : '';
 
-                // Todas las fotos se cargan desde el inicio dentro del carrusel, por eso al deslizar ya están listas.
+                // Todas las fotos se cargan de entrada dentro del carrusel: al deslizar ya están listas.
                 const slides = fotos.map(f => `<img src="${esc(f)}" alt="${esc(p.name)}" data-zoom="${esc(f)}" draggable="false" class="w-full h-full flex-none object-cover cursor-zoom-in">`).join('');
 
                 return `
-                    <article class="flex flex-col">
-                        <div class="relative aspect-square overflow-hidden rounded-md bg-cream-200 select-none" data-carrusel="${esc(p.id)}">
+                    <article class="flex flex-col bg-base-50 border border-base-300 rounded-xl overflow-hidden">
+                        <div class="relative aspect-square overflow-hidden bg-base-200 select-none" data-carrusel="${esc(p.id)}">
                             <div id="track-${esc(p.id)}" class="track flex h-full transition-transform duration-500 ease-out" style="transform: translateX(-${idx * 100}%)">${slides}</div>
                             ${badge}
                             ${controles}
                         </div>
-                        <div class="pt-4 space-y-1">
-                            <p class="text-xs text-stone-500">${esc(p.category || 'General')}</p>
-                            <h3 class="text-base font-semibold">${esc(p.name)}</h3>
-                            <p class="text-sm text-stone-600 line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
-                            <div class="flex items-center justify-between pt-3">
-                                <span class="text-lg font-semibold">${soles(p.price)}</span>
-                                <button data-quiero="${esc(p.id)}" class="fx px-4 py-2 border border-stone-900 text-stone-900 hover:bg-stone-900/80 hover:text-cream-50 text-sm font-medium rounded-md">Quiero este</button>
+                        <div class="p-6 flex flex-col gap-1.5 flex-1">
+                            <p class="text-xs font-medium text-stone-500">${esc(p.category || 'General')}</p>
+                            <h3 class="text-xl font-semibold">${esc(p.name)}</h3>
+                            <p class="text-sm text-stone-600 leading-relaxed line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
+                            <div class="flex items-center justify-between gap-3 pt-4 mt-auto">
+                                <span class="text-xl font-bold">${soles(p.price)}</span>
+                                <button data-quiero="${esc(p.id)}" class="btn btn-primary">${icon('chat', 'w-4 h-4')}Quiero este</button>
                             </div>
                         </div>
                     </article>`;
@@ -475,41 +524,71 @@
         function accionQuieroEste(p) {
             const foto = fotosDe(p)[0];
             const texto = `Hola, quiero este producto:\n- *${p.name}*\n- Categoría: ${p.category || '-'}\n- Precio: ${soles(p.price)}\n- Descripción: ${p.description || '-'}\n- Foto: ${foto}\n\n¿Está disponible?`;
-            const numeroValido = /^\d{8,15}$/.test(WHATSAPP_NUMERO);
-
-            if (numeroValido) {
-                window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`, '_blank');
-            } else {
-                // Respaldo: el enlace corto no admite mensaje, así que se copia al portapapeles
-                if (navigator.clipboard) navigator.clipboard.writeText(texto).catch(() => {});
-                alert('Copiamos la información del producto. Pégala en el chat de WhatsApp.');
-                window.open(WHATSAPP_LINK_RESPALDO, '_blank');
-            }
+            window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        function analizarNombreArchivoIA(e) {
-            const files = e.target.files;
-            if (!files || files.length === 0) return;
+        /* ---------- Editor de fotos (foto principal) ---------- */
+        function renderizarEditorFotos() {
+            const cont = $('editor-fotos');
+            $('editor-ayuda').classList.toggle('hidden', fotosEditor.length === 0);
+            cont.innerHTML = fotosEditor.map((f, i) => `
+                <div class="relative aspect-square rounded-lg overflow-hidden bg-base-200 border-2 ${i === principalIdx ? 'border-stone-900' : 'border-transparent'}">
+                    <button type="button" data-principal="${i}" class="absolute inset-0 w-full h-full" aria-label="Marcar como foto principal">
+                        <img src="${esc(f.preview)}" alt="" class="w-full h-full object-cover">
+                    </button>
+                    ${i === principalIdx ? `<span class="absolute bottom-1 left-1 inline-flex items-center gap-1 bg-stone-900 text-base-50 text-[10px] font-medium px-1.5 py-1 rounded-md pointer-events-none">${icon('star', 'w-3 h-3', true)}Principal</span>` : ''}
+                    <button type="button" data-quitar="${i}" aria-label="Quitar foto" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-base-50 text-stone-900 border border-base-300 flex items-center justify-center">${icon('x', 'w-3.5 h-3.5')}</button>
+                </div>
+            `).join('');
+        }
+
+        function configurarEventosEditorFotos() {
+            $('editor-fotos').addEventListener('click', (e) => {
+                const quitar = e.target.closest('[data-quitar]');
+                const principal = e.target.closest('[data-principal]');
+                if (quitar) {
+                    const i = Number(quitar.dataset.quitar);
+                    const [quitada] = fotosEditor.splice(i, 1);
+                    if (quitada && quitada.file) URL.revokeObjectURL(quitada.preview);
+                    if (i < principalIdx) principalIdx--;
+                    if (principalIdx >= fotosEditor.length) principalIdx = Math.max(0, fotosEditor.length - 1);
+                    renderizarEditorFotos();
+                } else if (principal) {
+                    principalIdx = Number(principal.dataset.principal);
+                    renderizarEditorFotos();
+                }
+            });
+        }
+
+        function agregarFotosEditor(e) {
+            const files = [...(e.target.files || [])];
+            if (files.length === 0) return;
+            const eraVacio = fotosEditor.length === 0;
+            files.forEach(file => fotosEditor.push({ file, preview: URL.createObjectURL(file) }));
+            if (eraVacio) principalIdx = 0;
+            renderizarEditorFotos();
+
+            // Autocompleta nombre/categoría/descripción (solo campos vacíos) con el nombre del archivo
             const estado = $('ia-estado');
             estado.classList.remove('hidden');
-
             let nombre = files[0].name.replace(/\.[^/.]+$/, '').replace(/[_.-]/g, ' ');
             nombre = nombre.charAt(0).toUpperCase() + nombre.slice(1);
-
             setTimeout(() => {
                 if (!$('prod-nombre').value) $('prod-nombre').value = nombre;
                 if (!$('prod-categoria').value) $('prod-categoria').value = 'Artesanía';
                 if (!$('prod-descripcion').value) $('prod-descripcion').value = `Pieza exclusiva "${nombre}" elaborada artesanalmente con acabados tradicionales.`;
                 estado.classList.add('hidden');
             }, 300);
+
+            e.target.value = ''; // permite volver a elegir el mismo archivo
         }
 
         /* ---------- Admin ---------- */
         function cambiarPestanaAdmin(tab) {
             $('panel-inventario').classList.add('hidden');
             $('panel-ventas').classList.add('hidden');
-            $('tab-inventario').className = 'pb-3 -mb-px border-b-2 border-transparent text-stone-500 hover:text-stone-900 text-sm';
-            $('tab-ventas').className = 'pb-3 -mb-px border-b-2 border-transparent text-stone-500 hover:text-stone-900 text-sm';
+            $('tab-inventario').className = 'pb-3 -mb-px border-b-2 border-transparent text-stone-600 hover:text-stone-900 text-sm';
+            $('tab-ventas').className = 'pb-3 -mb-px border-b-2 border-transparent text-stone-600 hover:text-stone-900 text-sm';
             $(`panel-${tab}`).classList.remove('hidden');
             $(`tab-${tab}`).className = 'pb-3 -mb-px border-b-2 border-stone-900 font-semibold text-sm';
         }
@@ -517,7 +596,6 @@
         async function cargarInventarioAdmin() {
             const { data } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
             inventarioGlobal = data || [];
-            // Descarta selecciones de productos que ya no existen
             const ids = new Set(inventarioGlobal.map(p => String(p.id)));
             [...seleccionados].forEach(id => { if (!ids.has(id)) seleccionados.delete(id); });
             renderizarInventario();
@@ -526,29 +604,33 @@
         function renderizarInventario() {
             const tbody = $('tabla-inventario-body');
             if (inventarioGlobal.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-stone-400">Aún no hay productos. Agrega el primero con “Nuevo producto”.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-stone-500">Aún no hay productos. Agrega el primero con “Nuevo producto”.</td></tr>';
                 actualizarBarraSeleccion();
                 return;
             }
-            tbody.innerHTML = inventarioGlobal.map(p => `
-                <tr class="${seleccionados.has(String(p.id)) ? 'bg-cream-200/60' : 'hover:bg-cream-100'}">
-                    <td class="p-4"><input type="checkbox" class="chk-fila accent-stone-900 w-4 h-4" data-id="${esc(p.id)}" ${seleccionados.has(String(p.id)) ? 'checked' : ''} aria-label="Seleccionar ${esc(p.name)}"></td>
+            tbody.innerHTML = inventarioGlobal.map(p => {
+                const sel = seleccionados.has(String(p.id));
+                return `
+                <tr class="${sel ? 'bg-base-200' : 'hover:bg-base-100'}">
+                    <td class="p-4"><input type="checkbox" class="chk-fila accent-stone-900 w-4 h-4" data-id="${esc(p.id)}" ${sel ? 'checked' : ''} aria-label="Seleccionar ${esc(p.name)}"></td>
                     <td class="p-4">
-                        <div class="flex items-center space-x-3">
-                            <img src="${esc(p.main_image || (p.images && p.images[0]) || 'https://via.placeholder.com/40')}" alt="" class="w-12 h-12 rounded-md object-cover border border-stone-300">
+                        <div class="flex items-center gap-3">
+                            <img src="${esc(fotosReales(p)[0] || 'https://via.placeholder.com/48')}" alt="" class="w-12 h-12 rounded-lg object-cover border border-base-300">
                             <span class="font-medium">${esc(p.name)}</span>
                         </div>
                     </td>
                     <td class="p-4 text-stone-600">${esc(p.category || '-')}</td>
                     <td class="p-4 font-medium">${soles(p.price)}</td>
-                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-md ${p.status === 'vendido' ? 'bg-stone-900 text-cream-50' : p.status === 'reservado' ? 'bg-stone-300 text-stone-800' : 'bg-cream-200 text-stone-700'}">${esc(p.status)}</span></td>
-                    <td class="p-4 text-right space-x-2 whitespace-nowrap">
-                        ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${esc(p.id)}')" class="fx text-xs px-3 py-1.5 border border-stone-400 rounded-md hover:bg-cream-50/60">Marcar vendido</button>` : ''}
-                        <button onclick="editarProducto('${esc(p.id)}')" class="fx text-xs px-3 py-1.5 border border-stone-400 rounded-md hover:bg-cream-50/60">Editar</button>
-                        <button onclick="eliminarProducto('${esc(p.id)}')" class="fx text-xs px-3 py-1.5 border border-stone-400 text-red-700 rounded-md hover:bg-red-50/60">Eliminar</button>
+                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-full ${p.status === 'vendido' ? 'bg-stone-900 text-base-50' : p.status === 'reservado' ? 'bg-base-300 text-stone-800' : 'bg-base-200 text-stone-700'}">${esc(p.status)}</span></td>
+                    <td class="p-4 text-right whitespace-nowrap">
+                        <div class="inline-flex gap-2">
+                            ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${esc(p.id)}')" class="btn btn-secondary btn-sm">${icon('check', 'w-3.5 h-3.5')}Vendido</button>` : ''}
+                            <button onclick="editarProducto('${esc(p.id)}')" class="btn btn-secondary btn-sm">${icon('pencil', 'w-3.5 h-3.5')}Editar</button>
+                            <button onclick="eliminarProducto('${esc(p.id)}')" class="btn btn-danger btn-sm" aria-label="Eliminar">${icon('trash', 'w-3.5 h-3.5')}</button>
+                        </div>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
             actualizarBarraSeleccion();
         }
 
@@ -577,10 +659,9 @@
         function actualizarBarraSeleccion() {
             const n = seleccionados.size;
             const total = inventarioGlobal.length;
-            const btn = $('btn-editar-masivo');
-            btn.classList.toggle('hidden', n === 0);
-            btn.textContent = `Editar selección (${n})`;
-            $('btn-sel-todos').textContent = (total > 0 && n === total) ? 'Quitar selección' : 'Seleccionar todos';
+            $('btn-editar-masivo').classList.toggle('hidden', n === 0);
+            $('lbl-editar-masivo').textContent = `Editar selección (${n})`;
+            $('lbl-sel-todos').textContent = (total > 0 && n === total) ? 'Quitar selección' : 'Seleccionar todos';
             $('chk-todos').checked = total > 0 && n === total;
             $('chk-todos').indeterminate = n > 0 && n < total;
         }
@@ -625,7 +706,6 @@
             btn.textContent = 'Aplicando…';
             try {
                 const ids = [...seleccionados];
-                // Productos que pasan a "vendido" ahora (para registrarlos en ventas)
                 const nuevosVendidos = estado === 'vendido'
                     ? inventarioGlobal.filter(p => seleccionados.has(String(p.id)) && p.status !== 'vendido')
                     : [];
@@ -675,15 +755,15 @@
             const tbody = $('tabla-ventas-body');
             const { data } = await supabaseClient.from('sales').select('*, products(name)').order('created_at', { ascending: false });
             if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-stone-400">Aún no hay ventas registradas.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-stone-500">Aún no hay ventas registradas.</td></tr>';
                 return;
             }
             tbody.innerHTML = data.map(v => `
-                <tr class="hover:bg-cream-100">
+                <tr class="hover:bg-base-100">
                     <td class="p-4 text-stone-600">${new Date(v.created_at).toLocaleDateString()}</td>
                     <td class="p-4 font-medium">${esc(v.products?.name || 'Pieza eliminada')}</td>
                     <td class="p-4 font-medium">${soles(v.sale_price)}</td>
-                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-md bg-cream-200 text-stone-700">${esc(v.status)}</span></td>
+                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-full bg-base-200 text-stone-700">${esc(v.status)}</span></td>
                 </tr>
             `).join('');
         }
@@ -692,6 +772,9 @@
             $('modal-titulo').innerText = 'Nuevo producto';
             $('form-producto').reset();
             $('prod-id').value = '';
+            fotosEditor = [];
+            principalIdx = 0;
+            renderizarEditorFotos();
             $('btn-guardar-prod').disabled = false;
             $('btn-guardar-prod').innerText = 'Guardar producto';
             $('modal-producto').classList.remove('hidden');
@@ -719,18 +802,32 @@
                     status: $('prod-estado').value
                 };
 
-                const files = $('prod-fotos').files;
-                const imageUrls = [];
+                // Sube las fotos nuevas (en orden) y conserva las existentes
+                const urls = [];
+                let principalUrl = null;
                 const fallos = [];
-                for (let i = 0; i < files.length; i++) {
-                    btn.innerText = `Subiendo foto ${i + 1} de ${files.length}…`;
-                    const file = files[i];
-                    const limpio = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-                    const filePath = `uploads/${Date.now()}_${Math.random().toString(36).slice(2)}_${limpio}`;
-                    const { error: upErr } = await supabaseClient.storage.from('productos').upload(filePath, file);
-                    if (upErr) { fallos.push(`${file.name}: ${upErr.message}`); continue; }
-                    const { data: pub } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
-                    if (pub && pub.publicUrl) imageUrls.push(pub.publicUrl);
+                const nuevas = fotosEditor.filter(f => f.file).length;
+                let subidas = 0;
+
+                for (let i = 0; i < fotosEditor.length; i++) {
+                    const f = fotosEditor[i];
+                    let url = f.url || null;
+                    if (f.file) {
+                        subidas++;
+                        btn.innerText = `Subiendo foto ${subidas} de ${nuevas}…`;
+                        const limpio = f.file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                        const filePath = `uploads/${Date.now()}_${Math.random().toString(36).slice(2)}_${limpio}`;
+                        const { error: upErr } = await supabaseClient.storage.from('productos').upload(filePath, f.file);
+                        if (upErr) { fallos.push(`${f.file.name}: ${upErr.message}`); }
+                        else {
+                            const { data: pub } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
+                            url = pub && pub.publicUrl ? pub.publicUrl : null;
+                        }
+                    }
+                    if (url) {
+                        urls.push(url);
+                        if (i === principalIdx) principalUrl = url;
+                    }
                 }
 
                 if (fallos.length > 0) {
@@ -738,9 +835,12 @@
                     if (!seguir) return;
                 }
 
-                if (imageUrls.length > 0) {
-                    productoData.images = imageUrls;
-                    productoData.main_image = imageUrls[0];
+                if (!principalUrl && urls.length) principalUrl = urls[0];
+                const ordenadas = principalUrl ? [principalUrl, ...urls.filter(u => u !== principalUrl)] : [];
+
+                if (ordenadas.length > 0 || id) {
+                    productoData.images = ordenadas;
+                    productoData.main_image = ordenadas[0] || null;
                 }
 
                 btn.innerText = 'Guardando…';
@@ -774,6 +874,10 @@
             $('prod-descripcion').value = data.description || '';
             $('prod-estado').value = data.status;
             $('prod-fotos').value = '';
+
+            fotosEditor = fotosReales(data).map(u => ({ url: u, preview: u }));
+            principalIdx = 0; // la principal guardada ya viene primero
+            renderizarEditorFotos();
 
             $('btn-guardar-prod').disabled = false;
             $('btn-guardar-prod').innerText = 'Guardar cambios';
