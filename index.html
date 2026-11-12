@@ -37,18 +37,19 @@
             --red: 229 31 47;        /* #e51f2f (solo acentos pequeños) */
             --red-text: 185 28 40;
             --dot: 70 65 60; --dot-a: .16;
-            --shadow: 0 1px 2px rgb(20 20 25 / .05), 0 10px 30px rgb(20 20 25 / .08);
-            --shadow-lift: 0 2px 4px rgb(20 20 25 / .06), 0 18px 40px rgb(20 20 25 / .14);
+            --margen-borde: 10px;  /* separación de la portada y del catálogo (móvil) respecto a los bordes */
+            --shadow: 0 1px 2px rgb(20 20 25 / .04), 0 5px 16px rgb(20 20 25 / .05);
+            --shadow-lift: 0 2px 4px rgb(20 20 25 / .05), 0 12px 28px rgb(20 20 25 / .09);
             --hero-img: url('https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/hero-image.png'), url('hero-image.png');
             --gap-card: 5px;      /* margen entre la foto y el borde de la tarjeta */
-            --gap-content: 5px;   /* margen lateral/inferior del texto, precio y botón */
+            --gap-content: 8px;   /* margen lateral/inferior del texto, precio y botón */
         }
         .dark {
             --bg: 20 20 22; --surface: 31 31 35; --soft: 42 42 47; --footer: 36 36 41;
             --ink: 236 236 238; --muted: 160 160 168; --accent: 110 168 240; --red-text: 255 128 138;
             --dot: 255 255 255; --dot-a: .06;
-            --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 10px 30px rgb(0 0 0 / .35);
-            --shadow-lift: 0 2px 4px rgb(0 0 0 / .35), 0 18px 40px rgb(0 0 0 / .5);
+            --shadow: 0 1px 2px rgb(0 0 0 / .25), 0 5px 16px rgb(0 0 0 / .24);
+            --shadow-lift: 0 2px 4px rgb(0 0 0 / .3), 0 12px 28px rgb(0 0 0 / .36);
             color-scheme: dark;
         }
         html { scroll-behavior: smooth; }
@@ -67,7 +68,7 @@
 
         /* ===== Hero ===== */
         #hero {
-            position: relative; overflow: hidden; margin: 10px; border-radius: 30px; min-height: 640px;
+            position: relative; overflow: hidden; margin: var(--margen-borde); border-radius: 30px; min-height: 640px;
             background-color: #2f3337;
             background-image: var(--hero-img), linear-gradient(135deg, #59606b, #23272d);
             background-size: cover; background-position: center;
@@ -76,8 +77,10 @@
                 .hero-text { color: #fff; text-shadow: 0 2px 14px rgb(0 0 0 / .4); }
         /* La portada ocupa todo el ancho (solo 10px de margen). En escritorio mantiene proporción 16:9 */
         @media (min-width: 640px) { #hero { min-height: 560px; } }
-        @media (min-width: 1024px) { #hero { height: min(56.25vw, calc(100svh - 20px)); min-height: 520px; } }
+        @media (min-width: 1024px) { #hero { height: min(56.25vw, calc(100svh - 2 * var(--margen-borde))); min-height: 520px; } }
         .hidden { display: none !important; }
+        @media (min-width: 640px) { .cat-link { font-size: 1.125rem; } }
+        #grid-productos { scroll-margin-top: 12px; }
         .logo-pill {
             display: inline-flex; align-items: center; padding: .55rem 1.4rem; border-radius: 9999px;
             background: rgb(250 250 249 / .92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
@@ -87,15 +90,15 @@
         #filtros-categorias { scrollbar-width: none; }
         #filtros-categorias::-webkit-scrollbar { display: none; }
         .cat-link {
-            position: relative; padding: .35rem .15rem .65rem; white-space: nowrap; cursor: pointer;
-            font-size: .9375rem; font-weight: 500; color: rgb(255 255 255 / .78); text-shadow: 0 1px 10px rgb(0 0 0 / .5);
+            position: relative; padding: .4rem .15rem .55rem; white-space: nowrap; cursor: pointer;
+            font-size: 1.0625rem; font-weight: 500; color: rgb(255 255 255 / .78); text-shadow: 0 1px 10px rgb(0 0 0 / .5);
             transition: color .25s ease, transform .3s cubic-bezier(.2, .8, .2, 1);
         }
         .cat-link:hover, .cat-link:focus-visible { color: #fff; transform: translateY(-2px); }
         .cat-link[aria-current="true"] { color: #fff; font-weight: 600; }
         .cat-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 6px; }
         .cat-linea {
-            position: absolute; left: 0; bottom: 0; height: 2px; width: 0; border-radius: 2px; background: #fff;
+            position: absolute; left: 0; bottom: 0; height: 3px; width: 0; border-radius: 3px 3px 0 0; background: #fff;
             box-shadow: 0 1px 6px rgb(0 0 0 / .35);
             transition: transform .35s cubic-bezier(.2, .8, .2, 1), width .35s cubic-bezier(.2, .8, .2, 1);
         }
@@ -135,7 +138,7 @@
             background: rgb(var(--bg) / .78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
             border-radius: 18px; box-shadow: var(--shadow);
         }
-        .nav-icon { width: 2rem; height: 2rem; border-radius: 12px; color: rgb(var(--muted)); }
+        .nav-icon { width: 2.25rem; height: 2.25rem; border-radius: 12px; color: rgb(var(--muted)); }
         .nav-icon:hover { background: rgb(var(--ink) / .08); color: rgb(var(--ink)); }
         .nav-icon-on, .nav-icon-on:hover { background: rgb(var(--ink)); color: rgb(var(--surface)); }
         /* Botón flotante de modo oscuro */
@@ -155,7 +158,7 @@
 <body class="min-h-screen">
 
     <!-- ================= HERO (solo en el catálogo) ================= -->
-    <section id="hero" class="flex flex-col gap-8 p-5 sm:p-8">
+    <section id="hero" class="flex flex-col gap-8 px-5 pt-5 pb-0 sm:px-8 sm:pt-8">
         <div class="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55 pointer-events-none"></div>
 
         <!-- Logo y título al centro (sin caja) -->
@@ -174,10 +177,10 @@
     </section>
 
     <!-- ================= CONTENIDO ================= -->
-    <main class="max-w-[1320px] mx-auto px-5">
+    <main class="max-w-[1320px] mx-auto px-[var(--margen-borde)] sm:px-5">
 
         <!-- CATÁLOGO PÚBLICO -->
-        <section id="vista-catalogo" class="pt-12 fade-in">
+        <section id="vista-catalogo" class="pt-6 fade-in">
             <div id="grid-productos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 lg:gap-8">
                 <div class="col-span-full text-center py-16 text-muted text-sm">Cargando piezas…</div>
             </div>
@@ -185,6 +188,7 @@
 
         <!-- PANEL ADMIN -->
         <section id="vista-admin" class="hidden pt-10 space-y-8 fade-in">
+            <div><button onclick="cambiarVista('catalogo')" class="btn btn-secondary btn-sm"><span data-icon="left" data-cls="w-3.5 h-3.5"></span>Volver al catálogo</button></div>
             <!-- Login -->
             <div id="admin-login" class="box max-w-sm mx-auto p-8 space-y-6">
                 <div class="text-center space-y-1">
@@ -268,11 +272,11 @@
     </main>
 
     <!-- ================= FOOTER ================= -->
-    <footer class="max-w-[1320px] mx-auto px-5 pt-16 pb-24">
+    <footer class="max-w-[1320px] mx-auto px-[var(--margen-borde)] sm:px-5 pt-16 pb-24">
         <div class="bg-footer rounded-[30px] shadow-soft p-8 sm:p-10 space-y-8">
             <!-- Logo + crédito -->
             <div class="flex flex-col items-center gap-6 md:flex-row md:justify-between">
-                <img id="logo-mono" src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes-mono.png" alt="creatiyés" class="h-10 sm:h-12 object-contain" onerror="this.onerror=null; this.src='logo_creatiyes-mono.png';">
+                <img id="logo-mono" src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-10 sm:h-12 object-contain">
                 <a href="https://linktr.ee/mau.mibranda" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-2.5 text-sm text-muted hover:text-ink transition-colors">
                     <span data-icon="linktree" data-cls="w-[18px] h-[18px] transition-transform duration-300 group-hover:-rotate-12 group-hover:text-accent"></span>
                     <span>Desarrollado por <strong class="font-semibold text-ink">Mauricio Miranda</strong></span>
@@ -303,14 +307,11 @@
         </div>
     </footer>
 
-    <!-- Selector flotante pequeño (solo para ti): Catálogo / Panel -->
-    <nav class="barra-flotante fixed z-40 p-1 flex gap-1" style="left: max(1rem, env(safe-area-inset-left)); bottom: max(1rem, env(safe-area-inset-bottom));" aria-label="Cambiar de vista">
-        <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="nav-icon nav-icon-on" title="Catálogo" aria-label="Catálogo"><span data-icon="grid" data-cls="w-4 h-4"></span></button>
-        <button onclick="cambiarVista('admin')" id="btn-admin" class="nav-icon" title="Panel" aria-label="Panel"><span data-icon="sliders" data-cls="w-4 h-4"></span></button>
-    </nav>
-
-    <!-- Botón flotante: modo oscuro -->
-    <button id="btn-tema" onclick="alternarTema()" class="fab fixed z-40" style="right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom));" aria-label="Cambiar modo oscuro" aria-pressed="false" title="Modo oscuro"></button>
+    <!-- Cajita flotante: modo claro/oscuro + volver arriba -->
+    <div class="barra-flotante fixed z-40 p-1 flex gap-1" style="right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom));">
+        <button id="btn-tema" onclick="alternarTema()" class="nav-icon" aria-label="Cambiar modo oscuro" aria-pressed="false" title="Modo oscuro"></button>
+        <button onclick="volverArriba()" class="nav-icon" aria-label="Volver arriba" title="Volver arriba"><span data-icon="arrowup" data-cls="w-[18px] h-[18px]"></span></button>
+    </div>
 
     <!-- Modal producto -->
     <div id="modal-producto" class="fixed inset-0 bg-black/45 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
@@ -438,6 +439,7 @@
             checksquare: '<path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
             upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
             logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+            arrowup: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
             moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
             sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
             // Linktree (relleno)
@@ -474,13 +476,31 @@
         const soles = (n) => 'S/ ' + Number(n || 0).toFixed(2);
 
         /* ---------- Modo oscuro ---------- */
+        const LOGO_COLOR = 'https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png';
+        const LOGO_BLANCO = 'https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes-mono.png';
+
         function sincronizarBotonTema() {
             const oscuro = document.documentElement.classList.contains('dark');
-            $('btn-tema').innerHTML = icon(oscuro ? 'sun' : 'moon', 'w-5 h-5');
+            $('btn-tema').innerHTML = icon(oscuro ? 'sun' : 'moon', 'w-[18px] h-[18px]');
             $('btn-tema').setAttribute('aria-pressed', String(oscuro));
             $('btn-tema').title = oscuro ? 'Modo claro' : 'Modo oscuro';
-            // El logo monocromático es oscuro: se invierte en modo oscuro
-            $('logo-mono').style.filter = oscuro ? 'invert(1) brightness(1.15)' : 'none';
+            // Footer: logo a color en modo claro, logo blanco en modo oscuro
+            const logo = $('logo-mono');
+            logo.onerror = oscuro ? () => { logo.onerror = null; logo.src = 'logo_creatiyes-mono.png'; } : null;
+            logo.src = oscuro ? LOGO_BLANCO : LOGO_COLOR;
+        }
+
+        function volverArriba() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function irAProductos() { $('grid-productos').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+        function estadoEtiqueta(estado) {
+            const e = String(estado || 'disponible').toLowerCase();
+            const cfg = {
+                disponible: { t: 'Disponible', c: 'rgb(var(--accent))' },
+                reservado: { t: 'Reservado', c: 'rgb(var(--muted))' },
+                vendido: { t: 'Vendido', c: 'rgb(var(--red))' }
+            }[e] || { t: e, c: 'rgb(var(--muted))' };
+            return `<span class="inline-flex items-center gap-1.5 normal-case tracking-normal font-medium text-muted"><span class="w-1.5 h-1.5 rounded-full" style="background: ${cfg.c}"></span>${esc(cfg.t)}</span>`;
         }
         function alternarTema() {
             const oscuro = document.documentElement.classList.toggle('dark');
@@ -549,8 +569,6 @@
             $('hero').classList.toggle('hidden', !enCatalogo);
             $('vista-catalogo').classList.toggle('hidden', !enCatalogo);
             $('vista-admin').classList.toggle('hidden', enCatalogo);
-            $('btn-catalogo').className = 'nav-icon' + (enCatalogo ? ' nav-icon-on' : '');
-            $('btn-admin').className = 'nav-icon' + (enCatalogo ? '' : ' nav-icon-on');
             if (enCatalogo) { cargarCatalogoPublico(); requestAnimationFrame(lineaEnSeleccion); }
             else verificarSesionReal();
             window.scrollTo({ top: 0 });
@@ -605,6 +623,7 @@
                 if (!b) return;
                 filtrarCategoria(b.dataset.cat);
                 b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+                irAProductos(); // al elegir una categoría, baja a los productos
             });
         }
 
@@ -660,7 +679,7 @@
                             ${controles}
                         </div>
                         <div class="flex flex-col gap-1.5 flex-1 pt-4" style="padding-left: var(--gap-content); padding-right: var(--gap-content); padding-bottom: var(--gap-content)">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-accent">${esc(p.category || 'General')}</p>
+                            <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider"><span class="text-accent">${esc(p.category || 'General')}</span><span class="text-muted" aria-hidden="true">·</span>${estadoEtiqueta(p.status)}</p>
                             <h3 class="font-title text-2xl">${esc(p.name)}</h3>
                             <p class="text-sm text-muted leading-relaxed line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
                             <div class="flex items-center justify-between gap-3 pt-4 mt-auto">
