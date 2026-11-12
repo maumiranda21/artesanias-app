@@ -130,7 +130,7 @@
         </section>
     </main>
 
-    <!-- MODAL PRODUCTO CON IA BASADA EN NOMBRE DE ARCHIVO -->
+    <!-- MODAL PRODUCTO -->
     <div id="modal-producto" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-lg rounded-lg p-8 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <h3 id="modal-titulo" class="text-xl font-bold text-stone-900">Nuevo Producto</h3>
@@ -391,10 +391,7 @@
             const estadoIA = document.getElementById('ia-estado');
             estadoIA.classList.remove('hidden');
 
-            // Tomamos el nombre del primer archivo (sin la extensión .jpg o .png)
             let nombreArchivo = files[0].name.replace(/\.[^/.]+$/, "");
-            
-            // Limpiamos guiones bajos y puntos, y ponemos la primera letra en mayúscula
             nombreArchivo = nombreArchivo.replace(/[_.-]/g, " ");
             nombreArchivo = nombreArchivo.charAt(0).toUpperCase() + nombreArchivo.slice(1);
 
@@ -403,7 +400,7 @@
                 document.getElementById('prod-categoria').value = "Artesanía";
                 document.getElementById('prod-descripcion').value = `Pieza exclusiva "${nombreArchivo}" elaborada artesanalmente con acabados tradicionales.`;
                 estadoIA.classList.add('hidden');
-            }, 600);
+            }, 400);
         }
 
         // Administración y Pestañas
@@ -498,12 +495,11 @@
             document.getElementById('modal-producto').classList.remove('flex');
         }
 
-        // GUARDADO ROBUSTO: Sube fotos una por una de manera segura para evitar que se quede en "Guardando..."
+        // GUARDADO ROBUSTO Y SEGURO (Sube fotos una por una sin bloquearse jamás)
         async function guardarProducto(e) {
             e.preventDefault();
             const btnGuardar = document.getElementById('btn-guardar-prod');
             btnGuardar.disabled = true;
-            btnGuardar.innerText = 'Guardando...';
 
             const id = document.getElementById('prod-id').value;
             const name = document.getElementById('prod-nombre').value;
@@ -519,13 +515,19 @@
                 let totalFotos = fileInput.files.length;
                 for (let i = 0; i < totalFotos; i++) {
                     let file = fileInput.files[i];
-                    btnGuardar.innerText = `Subiendo foto ${i + 1} de ${totalFotos}...`;
+                    btnGuardar.innerText = `Subiendo ${i + 1} de ${totalFotos}...`;
                     const filePath = `uploads/${Date.now()}_${Math.random().toString(36).substring(2)}_${file.name}`;
                     
-                    const { data, error } = await supabaseClient.storage.from('productos').upload(filePath, file);
-                    if (!error) {
-                        const { data: publicURL } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
-                        imageUrls.push(publicURL.publicUrl);
+                    try {
+                        const { data, error } = await supabaseClient.storage.from('productos').upload(filePath, file);
+                        if (!error) {
+                            const { data: publicURL } = supabaseClient.storage.from('productos').getPublicUrl(filePath);
+                            if (publicURL && publicURL.publicUrl) {
+                                imageUrls.push(publicURL.publicUrl);
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Error al subir archivo:", err);
                     }
                 }
             }
@@ -536,7 +538,7 @@
                 productoData.main_image = imageUrls[0];
             }
 
-            btnGuardar.innerText = 'Registrando en base de datos...';
+            btnGuardar.innerText = 'Guardando en base de datos...';
             let error;
             if (id) {
                 if (imageUrls.length === 0) {
