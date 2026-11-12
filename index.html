@@ -4,117 +4,201 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>creatiyés | Catálogo</title>
+    <script>
+        // Aplica el modo oscuro guardado antes de pintar (evita parpadeo)
+        try { var t = localStorage.getItem('tema'); if (t === 'oscuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); } catch (e) {}
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Paleta base (gris cálido neutro). Cambia estos 4 valores para cambiar todo el sitio.
-        tailwind.config = { theme: { extend: { colors: { base: { 50: '#f8f8f7', 100: '#efeeec', 200: '#e3e1de', 300: '#d3d0cb' } } } } };
+        tailwind.config = { theme: { extend: { colors: {
+            bg: 'rgb(var(--bg) / <alpha-value>)',
+            surface: 'rgb(var(--surface) / <alpha-value>)',
+            soft: 'rgb(var(--soft) / <alpha-value>)',
+            footer: 'rgb(var(--footer) / <alpha-value>)',
+            ink: 'rgb(var(--ink) / <alpha-value>)',
+            muted: 'rgb(var(--muted) / <alpha-value>)',
+            accent: 'rgb(var(--accent) / <alpha-value>)'
+        } } } };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ===== Paleta (claro / oscuro). Valores en RGB separados por espacio ===== */
+        :root {
+            --bg: 239 238 236;       /* fondo de la página */
+            --surface: 250 250 249;  /* tarjetas, cajas, modales */
+            --soft: 241 240 238;     /* campos y rellenos suaves */
+            --footer: 224 223 221;   /* gris del footer */
+            --ink: 38 38 41;         /* textos: gris muy oscuro */
+            --muted: 98 98 104;      /* textos secundarios */
+            --accent: 0 79 159;      /* #004f9f (solo acentos) */
+            --red: 229 31 47;        /* #e51f2f (solo acentos pequeños) */
+            --red-text: 185 28 40;
+            --dot: 70 65 60; --dot-a: .16;
+            --shadow: 0 1px 2px rgb(20 20 25 / .05), 0 10px 30px rgb(20 20 25 / .08);
+            --shadow-lift: 0 2px 4px rgb(20 20 25 / .06), 0 18px 40px rgb(20 20 25 / .14);
+            --hero-img: url('hero-image.png');
+        }
+        .dark {
+            --bg: 20 20 22; --surface: 31 31 35; --soft: 42 42 47; --footer: 36 36 41;
+            --ink: 236 236 238; --muted: 160 160 168; --accent: 110 168 240; --red-text: 255 128 138;
+            --dot: 255 255 255; --dot-a: .06;
+            --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 10px 30px rgb(0 0 0 / .35);
+            --shadow-lift: 0 2px 4px rgb(0 0 0 / .35), 0 18px 40px rgb(0 0 0 / .5);
+            color-scheme: dark;
+        }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            letter-spacing: -0.01em;
-            background-color: #efeeec;
-            background-image: radial-gradient(rgba(70, 65, 60, 0.16) 1px, transparent 1px);
+            font-family: 'Inter', sans-serif;
+            font-optical-sizing: auto;
+            background-color: rgb(var(--bg));
+            background-image: radial-gradient(rgb(var(--dot) / var(--dot-a)) 1px, transparent 1px);
             background-size: 18px 18px;
+            color: rgb(var(--ink));
+            transition: background-color .3s ease, color .3s ease;
         }
-        h1, h2, h3, h4 { line-height: 1.15; }
-        .fade-in { animation: fadeIn 0.25s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        /* Barras flotantes: mismo color del fondo, translúcidas, con blur que aumenta al desplazarse */
-        .barra-flotante {
-            background: rgba(239, 238, 236, .82);
-            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-            border: 1px solid rgba(120, 113, 108, .30);
-            border-radius: 4px;
-            box-shadow: 0 1px 2px rgba(28, 25, 23, .06);
-            transition: background-color .3s ease, box-shadow .3s ease, backdrop-filter .3s ease, -webkit-backdrop-filter .3s ease;
+        .calistoga-regular, .font-title { font-family: 'Calistoga', serif; font-weight: 400; font-style: normal; }
+        h1, h2, h3, h4 { line-height: 1.12; }
+        .shadow-soft { box-shadow: var(--shadow); }
+
+        /* ===== Hero ===== */
+        #hero {
+            position: relative; overflow: hidden; margin: 10px; border-radius: 30px;
+            background-color: #2f3337;
+            background-image: var(--hero-img), linear-gradient(135deg, #59606b, #23272d);
+            background-size: cover; background-position: center;
+            box-shadow: var(--shadow);
         }
-        .barra-flotante.scrolled {
-            background: rgba(239, 238, 236, .66);
+        .hero-text-box {
+            background: rgb(255 255 255 / .13);
             -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-            box-shadow: 0 10px 28px rgba(28, 25, 23, .13);
+            border-radius: 30px; box-shadow: 0 10px 40px rgb(0 0 0 / .22);
         }
-        .nav-icon {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 2.25rem; height: 2.25rem; border-radius: 3px; color: #57534e; cursor: pointer;
-            transition: background-color .2s ease, color .2s ease;
+        .hero-text { color: #fff; text-shadow: 0 2px 14px rgb(0 0 0 / .4); }
+        .logo-pill {
+            display: inline-flex; align-items: center; padding: .55rem 1.4rem; border-radius: 9999px;
+            background: rgb(250 250 249 / .92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+            box-shadow: 0 6px 20px rgb(0 0 0 / .18);
         }
-        .nav-icon:hover { background: rgba(28, 25, 23, .08); }
-        .nav-icon-on, .nav-icon-on:hover { background: #1c1917; color: #f8f8f7; }
-
-        /* Botones: relleno sólido por defecto, blur al pasar el mouse */
-        .btn, .chip, .icon-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
-            font-weight: 500; font-size: .875rem; line-height: 1; cursor: pointer;
-            transition: background-color .25s ease, backdrop-filter .25s ease, -webkit-backdrop-filter .25s ease, box-shadow .25s ease;
-        }
-        .btn { padding: .65rem 1.1rem; border-radius: 4px; border: 1px solid transparent; }
-        .btn-sm { padding: .45rem .75rem; font-size: .75rem; }
-        .btn-primary { background: #1c1917; color: #f8f8f7; }
-        .btn-secondary { background: #e3e1de; color: #1c1917; border-color: #cdcac4; }
-        .btn-danger { background: #f1dedc; color: #9b1c1c; border-color: #e2bdb9; }
-        .chip { padding: .5rem 1rem; border-radius: 4px; background: #f8f8f7; color: #44403c; border: 1px solid #cdcac4; white-space: nowrap; }
-        .chip-on { background: #1c1917; color: #f8f8f7; border-color: #1c1917; }
-        .icon-btn { width: 2.5rem; height: 2.5rem; border-radius: 4px; background: #f8f8f7; color: #1c1917; border: 1px solid #cdcac4; }
-        .btn-primary:not(:disabled):hover, .chip-on:hover { background: rgba(28, 25, 23, .82); }
-        .btn-secondary:not(:disabled):hover { background: rgba(227, 225, 222, .72); }
-        .btn-danger:not(:disabled):hover { background: rgba(241, 222, 220, .72); }
-        .chip:not(.chip-on):hover, .icon-btn:hover { background: rgba(248, 248, 247, .72); }
-        .btn:not(:disabled):hover, .chip:hover, .icon-btn:hover {
-            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(28, 25, 23, .14);
-        }
-        .btn:disabled { opacity: .6; cursor: not-allowed; }
-
-        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, label:focus-within { outline: 2px solid #1c1917; outline-offset: 2px; }
+        /* Etiquetas de navegación (solo texto con línea animada) */
         #filtros-categorias { scrollbar-width: none; }
         #filtros-categorias::-webkit-scrollbar { display: none; }
-        .field { width: 100%; padding: .65rem .75rem; border-radius: 4px; border: 1px solid #cdcac4; background: #f8f8f7; }
-        .field:focus { border-color: #1c1917; outline: none; }
+        .cat-link {
+            position: relative; padding: .35rem .15rem .65rem; white-space: nowrap; cursor: pointer;
+            font-size: .9375rem; font-weight: 500; color: rgb(255 255 255 / .78); text-shadow: 0 1px 10px rgb(0 0 0 / .5);
+            transition: color .25s ease, transform .3s cubic-bezier(.2, .8, .2, 1);
+        }
+        .cat-link:hover, .cat-link:focus-visible { color: #fff; transform: translateY(-2px); }
+        .cat-link[aria-current="true"] { color: #fff; font-weight: 600; }
+        .cat-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 6px; }
+        .cat-linea {
+            position: absolute; left: 0; bottom: 0; height: 2px; width: 0; border-radius: 2px; background: #fff;
+            box-shadow: 0 1px 6px rgb(0 0 0 / .35);
+            transition: transform .35s cubic-bezier(.2, .8, .2, 1), width .35s cubic-bezier(.2, .8, .2, 1);
+        }
+        .rise { animation: rise .8s cubic-bezier(.2, .8, .2, 1) both; }
+        @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn .25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ===== Cajas, campos y botones (sin bordes, sombras suaves) ===== */
+        .box { background: rgb(var(--surface)); border-radius: 30px; box-shadow: var(--shadow); }
+        .field { width: 100%; padding: .75rem .95rem; border-radius: 14px; background: rgb(var(--soft)); color: rgb(var(--ink)); border: 0; }
+        .field:focus { outline: none; box-shadow: 0 0 0 2px rgb(var(--accent)); }
+        .btn, .icon-btn, .nav-icon, .fab {
+            display: inline-flex; align-items: center; justify-content: center; gap: .5rem; cursor: pointer;
+            font-weight: 500; font-size: .875rem; line-height: 1;
+            transition: background-color .25s ease, backdrop-filter .25s ease, -webkit-backdrop-filter .25s ease, box-shadow .25s ease, color .25s ease, transform .25s ease;
+        }
+        .btn { padding: .75rem 1.2rem; border-radius: 16px; }
+        .btn-sm { padding: .5rem .8rem; font-size: .75rem; border-radius: 12px; }
+        .btn-primary { background: rgb(var(--ink)); color: rgb(var(--surface)); }
+        .btn-secondary { background: rgb(var(--soft)); color: rgb(var(--ink)); }
+        .btn-danger { background: rgb(var(--red) / .12); color: rgb(var(--red-text)); }
+        .btn-primary:not(:disabled):hover { background: rgb(var(--ink) / .85); }
+        .btn-secondary:not(:disabled):hover { background: rgb(var(--soft) / .7); }
+        .btn-danger:not(:disabled):hover { background: rgb(var(--red) / .2); }
+        .btn:not(:disabled):hover, .icon-btn:hover, .fab:hover {
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 6px 18px rgb(20 20 25 / .16);
+        }
+        .btn:disabled { opacity: .6; cursor: not-allowed; }
+        .icon-btn { width: 2.5rem; height: 2.5rem; border-radius: 14px; background: rgb(var(--surface) / .92); color: rgb(var(--ink)); box-shadow: 0 2px 10px rgb(20 20 25 / .18); }
+        .icon-btn:hover { background: rgb(var(--surface) / .7); }
+
+        /* Selector flotante pequeño (Catálogo / Panel) */
+        .barra-flotante {
+            background: rgb(var(--bg) / .78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+            border-radius: 18px; box-shadow: var(--shadow);
+        }
+        .nav-icon { width: 2rem; height: 2rem; border-radius: 12px; color: rgb(var(--muted)); }
+        .nav-icon:hover { background: rgb(var(--ink) / .08); color: rgb(var(--ink)); }
+        .nav-icon-on, .nav-icon-on:hover { background: rgb(var(--ink)); color: rgb(var(--surface)); }
+        /* Botón flotante de modo oscuro */
+        .fab { width: 3rem; height: 3rem; border-radius: 9999px; background: rgb(var(--surface) / .92); color: rgb(var(--ink)); box-shadow: var(--shadow-lift); }
+        .fab:hover { background: rgb(var(--surface) / .72); transform: rotate(14deg) scale(1.05); }
+
+        .badge { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; font-weight: 500; padding: .35rem .7rem; border-radius: 10px; }
+
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; }
         @media (prefers-reduced-motion: reduce) {
-            .fade-in { animation: none; }
-            .track { transition: none !important; }
+            .fade-in, .rise { animation: none; }
+            .track, .cat-linea { transition: none !important; }
+            html { scroll-behavior: auto; }
         }
     </style>
 </head>
-<body class="text-stone-900 min-h-screen">
+<body class="min-h-screen">
 
-    <!-- Header flotante -->
-    <div class="sticky top-0 z-30 px-3 sm:px-5 pt-3 pointer-events-none">
-        <header class="barra-flotante pointer-events-auto max-w-[1400px] mx-auto px-5 py-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-between sm:gap-6">
-            <div class="cursor-pointer shrink-0" onclick="cambiarVista('catalogo')">
-                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-12 sm:h-12 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
+    <!-- ================= HERO (solo en el catálogo) ================= -->
+    <section id="hero" class="flex flex-col justify-between gap-8 p-5 sm:p-8 min-h-[640px] sm:min-h-[560px] lg:min-h-0 lg:aspect-video lg:max-h-[calc(100svh-20px)]">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55 pointer-events-none"></div>
+
+        <!-- Logo en caja de lados redondeados -->
+        <div class="relative self-center sm:self-start rise">
+            <a href="#" onclick="cambiarVista('catalogo'); return false;" class="logo-pill" aria-label="creatiyés">
+                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-9 sm:h-11 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
+            </a>
+        </div>
+
+        <!-- Título al centro -->
+        <div class="relative flex justify-center my-auto">
+            <div class="hero-text-box rise max-w-3xl w-full text-center px-6 py-8 sm:px-12 sm:py-12" style="animation-delay: .12s">
+                <h1 class="hero-text font-title text-[2rem] leading-[1.1] sm:text-5xl lg:text-[3.4rem]">Querido Santa, haz que toda la tienda se venda como panetón y chocolate</h1>
+                <p class="hero-text mt-4 text-base sm:text-lg font-medium opacity-95">(Ponle magia a tus ambientes)</p>
             </div>
-            <!-- Categorías: bajo el logo en móvil (deslizable), a la derecha en escritorio -->
-            <div id="filtros-categorias" class="w-full sm:flex-1 min-w-0 overflow-x-auto"></div>
-        </header>
-    </div>
+        </div>
 
-    <main class="max-w-[1400px] mx-auto px-5 pt-8 pb-24">
+        <!-- Etiquetas de navegación al pie de la portada -->
+        <div id="filtros-categorias" class="relative rise w-full overflow-x-auto" style="animation-delay: .3s"></div>
+    </section>
+
+    <!-- ================= CONTENIDO ================= -->
+    <main class="max-w-[1240px] mx-auto px-5">
 
         <!-- CATÁLOGO PÚBLICO -->
-        <section id="vista-catalogo" class="fade-in">
-            <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-                <div class="col-span-full text-center py-16 text-stone-500 text-sm">Cargando piezas…</div>
+        <section id="vista-catalogo" class="pt-12 fade-in">
+            <div id="grid-productos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 lg:gap-8">
+                <div class="col-span-full text-center py-16 text-muted text-sm">Cargando piezas…</div>
             </div>
         </section>
 
         <!-- PANEL ADMIN -->
-        <section id="vista-admin" class="hidden space-y-8 fade-in">
+        <section id="vista-admin" class="hidden pt-10 space-y-8 fade-in">
             <!-- Login -->
-            <div id="admin-login" class="max-w-sm mx-auto bg-base-50 border border-base-300 rounded p-7 space-y-6">
+            <div id="admin-login" class="box max-w-sm mx-auto p-8 space-y-6">
                 <div class="text-center space-y-1">
-                    <h2 class="text-xl font-semibold">Acceso administrador</h2>
-                    <p class="text-sm text-stone-500">Ingresa con tu correo y contraseña.</p>
+                    <h2 class="font-title text-2xl">Acceso administrador</h2>
+                    <p class="text-sm text-muted">Ingresa con tu correo y contraseña.</p>
                 </div>
                 <form onsubmit="iniciarSesionAdmin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-sm text-stone-600 mb-1" for="login-email">Correo electrónico</label>
+                        <label class="block text-sm text-muted mb-1.5" for="login-email">Correo electrónico</label>
                         <input type="email" id="login-email" required class="field">
                     </div>
                     <div>
-                        <label class="block text-sm text-stone-600 mb-1" for="login-password">Contraseña</label>
+                        <label class="block text-sm text-muted mb-1.5" for="login-password">Contraseña</label>
                         <input type="password" id="login-password" required class="field">
                     </div>
                     <button type="submit" class="btn btn-primary w-full">Iniciar sesión</button>
@@ -123,60 +207,60 @@
 
             <!-- Dashboard -->
             <div id="admin-dashboard" class="hidden space-y-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-stone-400/50">
+                <div class="box flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-6">
                     <div>
-                        <h2 class="text-xl font-semibold">Panel de control</h2>
-                        <p class="text-sm text-stone-500" id="admin-user-email"></p>
+                        <h2 class="font-title text-2xl">Panel de control</h2>
+                        <p class="text-sm text-muted" id="admin-user-email"></p>
                     </div>
                     <button onclick="cerrarSesionAdmin()" class="btn btn-secondary"><span data-icon="logout"></span>Cerrar sesión</button>
                 </div>
 
-                <div class="flex space-x-6 border-b border-stone-400/50">
-                    <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-3 -mb-px border-b-2 border-stone-900 font-semibold text-sm">Inventario</button>
-                    <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 -mb-px border-b-2 border-transparent text-stone-600 hover:text-stone-900 text-sm">Ventas</button>
+                <div class="flex gap-7 px-2">
+                    <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-2 -mb-px border-b-2 border-accent font-semibold text-sm">Inventario</button>
+                    <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-2 -mb-px border-b-2 border-transparent text-muted hover:text-ink text-sm">Ventas</button>
                 </div>
 
                 <!-- Inventario -->
                 <div id="panel-inventario" class="space-y-4">
                     <div class="flex flex-wrap justify-between items-center gap-3">
-                        <h3 class="text-base font-semibold">Inventario</h3>
+                        <h3 class="font-title text-xl">Inventario</h3>
                         <div class="flex flex-wrap gap-2">
                             <button id="btn-sel-todos" onclick="alternarSeleccionTodos()" class="btn btn-secondary"><span data-icon="checksquare"></span><span id="lbl-sel-todos">Seleccionar todos</span></button>
                             <button id="btn-editar-masivo" onclick="abrirModalMasivo()" class="btn btn-primary hidden"><span data-icon="pencil"></span><span id="lbl-editar-masivo">Editar selección</span></button>
                             <button onclick="abrirModalProducto()" class="btn btn-primary"><span data-icon="plus"></span>Nuevo producto</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto border border-base-300 rounded bg-base-50">
+                    <div class="box overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[760px]">
                             <thead>
-                                <tr class="border-b border-base-300 text-xs text-stone-500">
-                                    <th class="p-4 w-10"><input type="checkbox" id="chk-todos" class="accent-stone-900 w-4 h-4" aria-label="Seleccionar todos"></th>
+                                <tr class="text-xs text-muted">
+                                    <th class="p-4 pl-6 w-10"><input type="checkbox" id="chk-todos" class="accent-[#004f9f] w-4 h-4" aria-label="Seleccionar todos"></th>
                                     <th class="p-4 font-medium">Pieza</th>
                                     <th class="p-4 font-medium">Categoría</th>
                                     <th class="p-4 font-medium">Precio</th>
                                     <th class="p-4 font-medium">Estado</th>
-                                    <th class="p-4 font-medium text-right">Acciones</th>
+                                    <th class="p-4 pr-6 font-medium text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-inventario-body" class="divide-y divide-base-200 text-sm"></tbody>
+                            <tbody id="tabla-inventario-body" class="divide-y divide-ink/10 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- Ventas -->
                 <div id="panel-ventas" class="hidden space-y-4">
-                    <h3 class="text-base font-semibold">Registro de ventas</h3>
-                    <div class="overflow-x-auto border border-base-300 rounded bg-base-50">
+                    <h3 class="font-title text-xl">Registro de ventas</h3>
+                    <div class="box overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[480px]">
                             <thead>
-                                <tr class="border-b border-base-300 text-xs text-stone-500">
-                                    <th class="p-4 font-medium">Fecha</th>
+                                <tr class="text-xs text-muted">
+                                    <th class="p-4 pl-6 font-medium">Fecha</th>
                                     <th class="p-4 font-medium">Producto</th>
                                     <th class="p-4 font-medium">Precio final</th>
-                                    <th class="p-4 font-medium">Estado</th>
+                                    <th class="p-4 pr-6 font-medium">Estado</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-ventas-body" class="divide-y divide-base-200 text-sm"></tbody>
+                            <tbody id="tabla-ventas-body" class="divide-y divide-ink/10 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -184,57 +268,96 @@
         </section>
     </main>
 
-    <!-- Selector flotante (solo para ti): Catálogo / Panel -->
-    <nav class="barra-flotante fixed z-40 p-1 flex gap-1" style="right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom));" aria-label="Cambiar de vista">
-        <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="nav-icon nav-icon-on" title="Catálogo" aria-label="Catálogo"><span data-icon="grid" data-cls="w-[18px] h-[18px]"></span></button>
-        <button onclick="cambiarVista('admin')" id="btn-admin" class="nav-icon" title="Panel" aria-label="Panel"><span data-icon="sliders" data-cls="w-[18px] h-[18px]"></span></button>
+    <!-- ================= FOOTER ================= -->
+    <footer class="max-w-[1240px] mx-auto px-5 pt-16 pb-24">
+        <div class="bg-footer rounded-[30px] shadow-soft p-8 sm:p-10 space-y-8">
+            <!-- Logo + crédito -->
+            <div class="flex flex-col items-center gap-6 md:flex-row md:justify-between">
+                <img id="logo-mono" src="logo_creatiyes-mono.png" alt="creatiyés" class="h-10 sm:h-12 object-contain">
+                <a href="https://linktr.ee/mau.mibranda" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-2.5 text-sm text-muted hover:text-ink transition-colors">
+                    <span data-icon="linktree" data-cls="w-[18px] h-[18px] transition-transform duration-300 group-hover:-rotate-12 group-hover:text-accent"></span>
+                    <span>Desarrollado por <strong class="font-semibold text-ink">Mauricio Miranda</strong></span>
+                </a>
+            </div>
+
+            <div class="h-px bg-ink/10"></div>
+
+            <!-- Términos -->
+            <div class="space-y-3 text-center md:text-left">
+                <h4 class="font-title text-lg">Términos</h4>
+                <ul class="grid gap-x-10 gap-y-2 md:grid-cols-2 text-sm text-muted leading-relaxed">
+                    <li>Los precios no incluyen costos de envío.</li>
+                    <li>Los costos de envío varían según proveedor de servicio.</li>
+                    <li>Consultar por envíos a zonas cercanas.</li>
+                    <li>Los pedidos se hacen vía WhatsApp.</li>
+                    <li>No hay más stock disponible.</li>
+                </ul>
+            </div>
+
+            <div class="h-px bg-ink/10"></div>
+
+            <!-- Pie -->
+            <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-between text-sm text-muted">
+                <p>© <span id="anio-actual"></span> creatiyés. Todos los derechos reservados.</p>
+                <button onclick="cambiarVista('admin')" class="btn btn-secondary btn-sm"><span data-icon="sliders" data-cls="w-3.5 h-3.5"></span>Acceso al panel</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Selector flotante pequeño (solo para ti): Catálogo / Panel -->
+    <nav class="barra-flotante fixed z-40 p-1 flex gap-1" style="left: max(1rem, env(safe-area-inset-left)); bottom: max(1rem, env(safe-area-inset-bottom));" aria-label="Cambiar de vista">
+        <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="nav-icon nav-icon-on" title="Catálogo" aria-label="Catálogo"><span data-icon="grid" data-cls="w-4 h-4"></span></button>
+        <button onclick="cambiarVista('admin')" id="btn-admin" class="nav-icon" title="Panel" aria-label="Panel"><span data-icon="sliders" data-cls="w-4 h-4"></span></button>
     </nav>
 
+    <!-- Botón flotante: modo oscuro -->
+    <button id="btn-tema" onclick="alternarTema()" class="fab fixed z-40" style="right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom));" aria-label="Cambiar modo oscuro" aria-pressed="false" title="Modo oscuro"></button>
+
     <!-- Modal producto -->
-    <div id="modal-producto" class="fixed inset-0 bg-stone-900/50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-base-50 w-full max-w-lg rounded p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
-            <h3 id="modal-titulo" class="text-lg font-semibold">Nuevo producto</h3>
+    <div id="modal-producto" class="fixed inset-0 bg-black/45 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="box w-full max-w-lg p-8 space-y-5 max-h-[90vh] overflow-y-auto fade-in" style="box-shadow: var(--shadow-lift)">
+            <h3 id="modal-titulo" class="font-title text-2xl">Nuevo producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
                 <div>
-                    <span class="block text-sm text-stone-600 mb-1">Fotografías</span>
+                    <span class="block text-sm text-muted mb-1.5">Fotografías</span>
                     <label for="prod-fotos" class="btn btn-secondary w-full"><span data-icon="upload"></span>Agregar fotos</label>
                     <input type="file" id="prod-fotos" multiple accept="image/*" onchange="agregarFotosEditor(event)" class="sr-only">
-                    <p id="ia-estado" class="text-xs text-stone-500 mt-1.5 hidden">Leyendo nombre de archivo…</p>
-                    <div id="editor-fotos" class="grid grid-cols-4 gap-2 mt-3"></div>
-                    <p id="editor-ayuda" class="text-xs text-stone-500 mt-2 hidden">Toca una foto para marcarla como principal. Esa es la que se verá primero en la tarjeta.</p>
+                    <p id="ia-estado" class="text-xs text-muted mt-1.5 hidden">Leyendo nombre de archivo…</p>
+                    <div id="editor-fotos" class="grid grid-cols-4 gap-2.5 mt-3"></div>
+                    <p id="editor-ayuda" class="text-xs text-muted mt-2 hidden">Toca una foto para marcarla como principal. Esa es la que se verá primero en la tarjeta.</p>
                 </div>
                 <div>
-                    <label class="block text-sm text-stone-600 mb-1" for="prod-nombre">Nombre</label>
+                    <label class="block text-sm text-muted mb-1.5" for="prod-nombre">Nombre</label>
                     <input type="text" id="prod-nombre" required class="field">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-stone-600 mb-1" for="prod-categoria">Categoría</label>
+                        <label class="block text-sm text-muted mb-1.5" for="prod-categoria">Categoría</label>
                         <input type="text" id="prod-categoria" required class="field">
                     </div>
                     <div>
-                        <label class="block text-sm text-stone-600 mb-1" for="prod-precio">Precio (S/)</label>
+                        <label class="block text-sm text-muted mb-1.5" for="prod-precio">Precio (S/)</label>
                         <input type="number" step="0.01" id="prod-precio" required class="field">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm text-stone-600 mb-1" for="prod-coleccion">Colección (opcional)</label>
+                    <label class="block text-sm text-muted mb-1.5" for="prod-coleccion">Colección (opcional)</label>
                     <input type="text" id="prod-coleccion" class="field">
                 </div>
                 <div>
-                    <label class="block text-sm text-stone-600 mb-1" for="prod-descripcion">Descripción</label>
+                    <label class="block text-sm text-muted mb-1.5" for="prod-descripcion">Descripción</label>
                     <textarea id="prod-descripcion" rows="3" class="field"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm text-stone-600 mb-1" for="prod-estado">Estado</label>
+                    <label class="block text-sm text-muted mb-1.5" for="prod-estado">Estado</label>
                     <select id="prod-estado" class="field">
                         <option value="disponible">Disponible</option>
                         <option value="reservado">Reservado</option>
                         <option value="vendido">Vendido</option>
                     </select>
                 </div>
-                <div class="flex justify-end gap-3 pt-4 border-t border-base-300">
+                <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="cerrarModalProducto()" class="btn btn-secondary">Cancelar</button>
                     <button type="submit" id="btn-guardar-prod" class="btn btn-primary">Guardar producto</button>
                 </div>
@@ -243,33 +366,33 @@
     </div>
 
     <!-- Modal edición en masa -->
-    <div id="modal-masivo" class="fixed inset-0 bg-stone-900/50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-base-50 w-full max-w-lg rounded p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+    <div id="modal-masivo" class="fixed inset-0 bg-black/45 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="box w-full max-w-lg p-8 space-y-5 max-h-[90vh] overflow-y-auto fade-in" style="box-shadow: var(--shadow-lift)">
             <div class="space-y-1">
-                <h3 id="masivo-titulo" class="text-lg font-semibold">Editar selección</h3>
-                <p class="text-sm text-stone-500">Se aplicará a todos los productos seleccionados. Los campos que dejes vacíos no se modifican.</p>
+                <h3 id="masivo-titulo" class="font-title text-2xl">Editar selección</h3>
+                <p class="text-sm text-muted">Se aplicará a todos los productos seleccionados. Los campos que dejes vacíos no se modifican.</p>
             </div>
             <form id="form-masivo" onsubmit="guardarMasivo(event)" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-stone-600 mb-1" for="mas-categoria">Categoría</label>
+                        <label class="block text-sm text-muted mb-1.5" for="mas-categoria">Categoría</label>
                         <input type="text" id="mas-categoria" class="field">
                     </div>
                     <div>
-                        <label class="block text-sm text-stone-600 mb-1" for="mas-precio">Precio (S/)</label>
+                        <label class="block text-sm text-muted mb-1.5" for="mas-precio">Precio (S/)</label>
                         <input type="number" step="0.01" id="mas-precio" class="field">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm text-stone-600 mb-1" for="mas-coleccion">Colección</label>
+                    <label class="block text-sm text-muted mb-1.5" for="mas-coleccion">Colección</label>
                     <input type="text" id="mas-coleccion" class="field">
                 </div>
                 <div>
-                    <label class="block text-sm text-stone-600 mb-1" for="mas-descripcion">Descripción</label>
+                    <label class="block text-sm text-muted mb-1.5" for="mas-descripcion">Descripción</label>
                     <textarea id="mas-descripcion" rows="3" class="field"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm text-stone-600 mb-1" for="mas-estado">Estado</label>
+                    <label class="block text-sm text-muted mb-1.5" for="mas-estado">Estado</label>
                     <select id="mas-estado" class="field">
                         <option value="">No cambiar</option>
                         <option value="disponible">Disponible</option>
@@ -277,7 +400,7 @@
                         <option value="vendido">Vendido</option>
                     </select>
                 </div>
-                <div class="flex justify-end gap-3 pt-4 border-t border-base-300">
+                <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="cerrarModalMasivo()" class="btn btn-secondary">Cancelar</button>
                     <button type="submit" id="btn-guardar-masivo" class="btn btn-primary">Aplicar cambios</button>
                 </div>
@@ -286,10 +409,10 @@
     </div>
 
     <!-- Zoom de imagen -->
-    <div id="modal-zoom" class="fixed inset-0 bg-stone-900/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
-        <button onclick="cerrarZoom()" aria-label="Cerrar imagen" class="icon-btn fixed top-4 right-4 w-11 h-11 shadow-md"><span data-icon="x" data-cls="w-5 h-5"></span></button>
-        <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[80vh] rounded object-contain" onclick="event.stopPropagation()">
-        <p class="fixed bottom-6 inset-x-0 text-center text-sm text-base-100">Presiona Esc o toca afuera para cerrar</p>
+    <div id="modal-zoom" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
+        <button onclick="cerrarZoom()" aria-label="Cerrar imagen" class="icon-btn fixed top-4 right-4 w-11 h-11"><span data-icon="x" data-cls="w-5 h-5"></span></button>
+        <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[80vh] rounded-[22px] object-contain" onclick="event.stopPropagation()">
+        <p class="fixed bottom-6 inset-x-0 text-center text-sm text-white/80">Presiona Esc o toca afuera para cerrar</p>
     </div>
 
     <script>
@@ -309,10 +432,16 @@
             checksquare: '<path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
             upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
             logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
-            zoom: '<circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/>'
+            moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+            sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+            // Linktree (relleno)
+            linktree: '<path d="m13.73635 5.85251 4.00467-4.11665 2.3248 2.3808-4.20064 4.00466h5.9085v3.30473h-5.9365l4.22865 4.10766-2.3248 2.3338L12.0005 12.099l-5.74052 5.76852-2.3248-2.3338 4.22864-4.10766h-5.9375V8.12132h5.9085L3.93417 4.11786l2.3248-2.3808 4.00468 4.11665V0h3.4727zm-3.4727 10.30614h3.4727V24h-3.4727z"/>'
         };
-        const icon = (name, cls = 'w-4 h-4', relleno = false) =>
-            `<svg class="${cls} shrink-0" viewBox="0 0 24 24" fill="${relleno ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+        const ICONOS_RELLENOS = ['linktree'];
+        const icon = (name, cls = 'w-4 h-4', relleno = false) => {
+            const lleno = relleno || ICONOS_RELLENOS.includes(name);
+            return `<svg class="${cls} shrink-0" viewBox="0 0 24 24" fill="${lleno ? 'currentColor' : 'none'}" stroke="${lleno && name === 'linktree' ? 'none' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+        };
         document.querySelectorAll('[data-icon]').forEach(el => {
             el.outerHTML = icon(el.dataset.icon, el.dataset.cls || 'w-4 h-4');
         });
@@ -338,19 +467,32 @@
         const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const soles = (n) => 'S/ ' + Number(n || 0).toFixed(2);
 
+        /* ---------- Modo oscuro ---------- */
+        function sincronizarBotonTema() {
+            const oscuro = document.documentElement.classList.contains('dark');
+            $('btn-tema').innerHTML = icon(oscuro ? 'sun' : 'moon', 'w-5 h-5');
+            $('btn-tema').setAttribute('aria-pressed', String(oscuro));
+            $('btn-tema').title = oscuro ? 'Modo claro' : 'Modo oscuro';
+            // El logo monocromático es oscuro: se invierte en modo oscuro
+            $('logo-mono').style.filter = oscuro ? 'invert(1) brightness(1.15)' : 'none';
+        }
+        function alternarTema() {
+            const oscuro = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('tema', oscuro ? 'oscuro' : 'claro'); } catch (e) {}
+            sincronizarBotonTema();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            $('anio-actual').textContent = new Date().getFullYear();
+            sincronizarBotonTema();
             verificarSesionReal();
             cargarCatalogoPublico();
             configurarEventosCatalogo();
+            configurarEventosCategorias();
             configurarEventosEditorFotos();
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(lineaEnSeleccion);
+            window.addEventListener('resize', lineaEnSeleccion);
         });
-
-        function actualizarBarrasScroll() {
-            const activo = window.scrollY > 8;
-            document.querySelectorAll('.barra-flotante').forEach(b => b.classList.toggle('scrolled', activo));
-        }
-        window.addEventListener('scroll', actualizarBarrasScroll, { passive: true });
-        actualizarBarrasScroll();
 
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape') return;
@@ -393,12 +535,13 @@
 
         function cambiarVista(vista) {
             const enCatalogo = vista === 'catalogo';
+            $('hero').classList.toggle('hidden', !enCatalogo);
             $('vista-catalogo').classList.toggle('hidden', !enCatalogo);
             $('vista-admin').classList.toggle('hidden', enCatalogo);
-            $('filtros-categorias').classList.toggle('hidden', !enCatalogo);
             $('btn-catalogo').className = 'nav-icon' + (enCatalogo ? ' nav-icon-on' : '');
             $('btn-admin').className = 'nav-icon' + (enCatalogo ? '' : ' nav-icon-on');
-            if (enCatalogo) cargarCatalogoPublico(); else verificarSesionReal();
+            if (enCatalogo) { cargarCatalogoPublico(); requestAnimationFrame(lineaEnSeleccion); }
+            else verificarSesionReal();
             window.scrollTo({ top: 0 });
         }
 
@@ -407,28 +550,57 @@
             const grid = $('grid-productos');
             const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
             if (error) {
-                grid.innerHTML = `<div class="col-span-full text-center py-16 text-red-700 text-sm">No se pudieron cargar los productos: ${esc(error.message)}</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-16 text-sm" style="color: rgb(var(--red-text))">No se pudieron cargar los productos: ${esc(error.message)}</div>`;
                 return;
             }
             productosGlobal = data || [];
+            if (categoriaActual !== 'todos' && !productosGlobal.some(p => p.category === categoriaActual)) categoriaActual = 'todos';
             actualizarFiltrosCategorias();
             renderizarProductos();
         }
 
+        /* Etiquetas de la portada: texto flotante + línea animada */
         function actualizarFiltrosCategorias() {
             const categorias = ['todos', ...new Set(productosGlobal.map(p => p.category).filter(Boolean))];
+            $('filtros-categorias').innerHTML = `
+                <div id="cat-inner" class="relative flex w-max mx-auto gap-7 sm:gap-10">
+                    ${categorias.map(cat => `
+                        <button data-cat="${esc(cat)}" class="cat-link" aria-current="${categoriaActual === cat}">
+                            ${esc(cat === 'todos' ? 'Todas' : cat.charAt(0).toUpperCase() + cat.slice(1))}
+                        </button>`).join('')}
+                    <span id="cat-linea" class="cat-linea"></span>
+                </div>`;
+            requestAnimationFrame(lineaEnSeleccion);
+        }
+
+        function posicionarLinea(btn) {
+            const linea = $('cat-linea');
+            if (!btn || !linea) return;
+            linea.style.width = btn.offsetWidth + 'px';
+            linea.style.transform = `translateX(${btn.offsetLeft}px)`;
+        }
+        function lineaEnSeleccion() {
+            posicionarLinea($('filtros-categorias').querySelector('.cat-link[aria-current="true"]'));
+        }
+
+        function configurarEventosCategorias() {
             const cont = $('filtros-categorias');
-            cont.innerHTML = '<div class="flex w-max gap-2 mx-auto sm:mx-0 sm:ml-auto">' + categorias.map(cat => `
-                <button data-cat="${esc(cat)}" class="chip ${categoriaActual === cat ? 'chip-on' : ''}">
-                    ${esc(cat === 'todos' ? 'Todas' : cat.charAt(0).toUpperCase() + cat.slice(1))}
-                </button>
-            `).join('') + '</div>';
-            cont.querySelectorAll('button').forEach(b => b.addEventListener('click', () => filtrarCategoria(b.dataset.cat)));
+            cont.addEventListener('mouseover', (e) => { const b = e.target.closest('.cat-link'); if (b) posicionarLinea(b); });
+            cont.addEventListener('focusin', (e) => { const b = e.target.closest('.cat-link'); if (b) posicionarLinea(b); });
+            cont.addEventListener('mouseleave', lineaEnSeleccion);
+            cont.addEventListener('focusout', lineaEnSeleccion);
+            cont.addEventListener('click', (e) => {
+                const b = e.target.closest('.cat-link');
+                if (!b) return;
+                filtrarCategoria(b.dataset.cat);
+                b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+            });
         }
 
         function filtrarCategoria(cat) {
             categoriaActual = cat;
-            actualizarFiltrosCategorias();
+            $('filtros-categorias').querySelectorAll('.cat-link').forEach(b => b.setAttribute('aria-current', String(b.dataset.cat === cat)));
+            lineaEnSeleccion();
             renderizarProductos();
         }
 
@@ -448,7 +620,7 @@
             const filtrados = categoriaActual === 'todos' ? productosGlobal : productosGlobal.filter(p => p.category === categoriaActual);
 
             if (filtrados.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-16 text-stone-500 text-sm">No hay piezas en esta categoría.</div>';
+                grid.innerHTML = '<div class="col-span-full text-center py-16 text-muted text-sm">No hay piezas en esta categoría.</div>';
                 return;
             }
 
@@ -459,28 +631,28 @@
                 carruselIndices[p.id] = idx;
 
                 const badge = p.status === 'vendido' || p.status === 'reservado'
-                    ? `<span class="absolute top-3 left-3 z-10 bg-base-50 text-stone-900 text-xs font-medium px-3 py-1.5 rounded border border-base-300">${p.status === 'vendido' ? 'Vendido' : 'Reservado'}</span>` : '';
+                    ? `<span class="badge absolute top-3 left-3 z-10 bg-surface text-ink shadow-soft">${p.status === 'vendido' ? '<span class="w-1.5 h-1.5 rounded-full" style="background: rgb(var(--red))"></span>Vendido' : 'Reservado'}</span>` : '';
 
                 const controles = fotos.length > 1 ? `
                     <button data-prev="${esc(p.id)}" aria-label="Foto anterior" class="icon-btn absolute left-3 top-1/2 -translate-y-1/2 z-10">${icon('left', 'w-5 h-5')}</button>
                     <button data-next="${esc(p.id)}" aria-label="Foto siguiente" class="icon-btn absolute right-3 top-1/2 -translate-y-1/2 z-10">${icon('right', 'w-5 h-5')}</button>
-                    <div id="cnt-${esc(p.id)}" class="absolute bottom-3 right-3 bg-base-50 text-stone-900 text-xs font-medium px-2.5 py-1 rounded border border-base-300 z-10">${idx + 1}/${fotos.length}</div>` : '';
+                    <div id="cnt-${esc(p.id)}" class="badge absolute bottom-3 right-3 z-10 bg-surface text-ink shadow-soft">${idx + 1}/${fotos.length}</div>` : '';
 
                 // Todas las fotos se cargan de entrada dentro del carrusel: al deslizar ya están listas.
                 const slides = fotos.map(f => `<img src="${esc(f)}" alt="${esc(p.name)}" data-zoom="${esc(f)}" draggable="false" class="w-full h-full flex-none object-cover cursor-zoom-in">`).join('');
 
                 return `
-                    <article class="flex flex-col bg-base-50 border border-base-300 rounded overflow-hidden">
-                        <div class="relative aspect-square overflow-hidden bg-base-200 select-none" data-carrusel="${esc(p.id)}">
+                    <article class="flex flex-col bg-surface rounded-[30px] p-3 shadow-soft transition duration-300 hover:-translate-y-0.5" onmouseenter="this.style.boxShadow='var(--shadow-lift)'" onmouseleave="this.style.boxShadow=''">
+                        <div class="relative aspect-square overflow-hidden rounded-[22px] bg-soft select-none" data-carrusel="${esc(p.id)}">
                             <div id="track-${esc(p.id)}" class="track flex h-full transition-transform duration-500 ease-out" style="transform: translateX(-${idx * 100}%)">${slides}</div>
                             ${badge}
                             ${controles}
                         </div>
-                        <div class="p-6 flex flex-col gap-1.5 flex-1">
-                            <p class="text-xs font-medium text-stone-500">${esc(p.category || 'General')}</p>
-                            <h3 class="text-xl font-semibold">${esc(p.name)}</h3>
-                            <p class="text-sm text-stone-600 leading-relaxed line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
-                            <div class="flex items-center justify-between gap-3 pt-4 mt-auto">
+                        <div class="flex flex-col gap-1.5 flex-1 px-3 pt-5 pb-3">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-accent">${esc(p.category || 'General')}</p>
+                            <h3 class="font-title text-2xl">${esc(p.name)}</h3>
+                            <p class="text-sm text-muted leading-relaxed line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
+                            <div class="flex items-center justify-between gap-3 pt-5 mt-auto">
                                 <span class="text-xl font-bold">${soles(p.price)}</span>
                                 <button data-quiero="${esc(p.id)}" class="btn btn-primary">${icon('chat', 'w-4 h-4')}Quiero este</button>
                             </div>
@@ -557,12 +729,12 @@
             const cont = $('editor-fotos');
             $('editor-ayuda').classList.toggle('hidden', fotosEditor.length === 0);
             cont.innerHTML = fotosEditor.map((f, i) => `
-                <div class="relative aspect-square rounded overflow-hidden bg-base-200 border-2 ${i === principalIdx ? 'border-stone-900' : 'border-transparent'}">
+                <div class="relative aspect-square rounded-[14px] overflow-hidden bg-soft" style="${i === principalIdx ? 'box-shadow: 0 0 0 2px rgb(var(--accent))' : ''}">
                     <button type="button" data-principal="${i}" class="absolute inset-0 w-full h-full" aria-label="Marcar como foto principal">
                         <img src="${esc(f.preview)}" alt="" class="w-full h-full object-cover">
                     </button>
-                    ${i === principalIdx ? `<span class="absolute bottom-1 left-1 inline-flex items-center gap-1 bg-stone-900 text-base-50 text-[10px] font-medium px-1.5 py-1 rounded pointer-events-none">${icon('star', 'w-3 h-3', true)}Principal</span>` : ''}
-                    <button type="button" data-quitar="${i}" aria-label="Quitar foto" class="absolute top-1 right-1 w-6 h-6 rounded bg-base-50 text-stone-900 border border-base-300 flex items-center justify-center">${icon('x', 'w-3.5 h-3.5')}</button>
+                    ${i === principalIdx ? `<span class="absolute bottom-1 left-1 inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-1 rounded-[8px] pointer-events-none" style="background: rgb(var(--accent)); color: #fff">${icon('star', 'w-3 h-3', true)}Principal</span>` : ''}
+                    <button type="button" data-quitar="${i}" aria-label="Quitar foto" class="absolute top-1 right-1 w-6 h-6 rounded-[8px] bg-surface text-ink shadow-soft flex items-center justify-center">${icon('x', 'w-3.5 h-3.5')}</button>
                 </div>
             `).join('');
         }
@@ -612,10 +784,10 @@
         function cambiarPestanaAdmin(tab) {
             $('panel-inventario').classList.add('hidden');
             $('panel-ventas').classList.add('hidden');
-            $('tab-inventario').className = 'pb-3 -mb-px border-b-2 border-transparent text-stone-600 hover:text-stone-900 text-sm';
-            $('tab-ventas').className = 'pb-3 -mb-px border-b-2 border-transparent text-stone-600 hover:text-stone-900 text-sm';
+            $('tab-inventario').className = 'pb-2 -mb-px border-b-2 border-transparent text-muted hover:text-ink text-sm';
+            $('tab-ventas').className = 'pb-2 -mb-px border-b-2 border-transparent text-muted hover:text-ink text-sm';
             $(`panel-${tab}`).classList.remove('hidden');
-            $(`tab-${tab}`).className = 'pb-3 -mb-px border-b-2 border-stone-900 font-semibold text-sm';
+            $(`tab-${tab}`).className = 'pb-2 -mb-px border-b-2 border-accent font-semibold text-sm';
         }
 
         async function cargarInventarioAdmin() {
@@ -626,28 +798,34 @@
             renderizarInventario();
         }
 
+        function badgeEstado(s) {
+            if (s === 'vendido') return `<span class="badge bg-ink text-surface"><span class="w-1.5 h-1.5 rounded-full" style="background: rgb(var(--red))"></span>vendido</span>`;
+            if (s === 'reservado') return `<span class="badge bg-ink/15 text-ink">reservado</span>`;
+            return `<span class="badge bg-soft text-muted">${esc(s)}</span>`;
+        }
+
         function renderizarInventario() {
             const tbody = $('tabla-inventario-body');
             if (inventarioGlobal.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-stone-500">Aún no hay productos. Agrega el primero con “Nuevo producto”.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-muted">Aún no hay productos. Agrega el primero con “Nuevo producto”.</td></tr>';
                 actualizarBarraSeleccion();
                 return;
             }
             tbody.innerHTML = inventarioGlobal.map(p => {
                 const sel = seleccionados.has(String(p.id));
                 return `
-                <tr class="${sel ? 'bg-base-200' : 'hover:bg-base-100'}">
-                    <td class="p-4"><input type="checkbox" class="chk-fila accent-stone-900 w-4 h-4" data-id="${esc(p.id)}" ${sel ? 'checked' : ''} aria-label="Seleccionar ${esc(p.name)}"></td>
+                <tr class="${sel ? 'bg-soft' : 'hover:bg-soft/60'}">
+                    <td class="p-4 pl-6"><input type="checkbox" class="chk-fila accent-[#004f9f] w-4 h-4" data-id="${esc(p.id)}" ${sel ? 'checked' : ''} aria-label="Seleccionar ${esc(p.name)}"></td>
                     <td class="p-4">
                         <div class="flex items-center gap-3">
-                            <img src="${esc(fotosReales(p)[0] || 'https://via.placeholder.com/48')}" alt="" class="w-12 h-12 rounded object-cover border border-base-300">
+                            <img src="${esc(fotosReales(p)[0] || 'https://via.placeholder.com/48')}" alt="" class="w-12 h-12 rounded-[14px] object-cover">
                             <span class="font-medium">${esc(p.name)}</span>
                         </div>
                     </td>
-                    <td class="p-4 text-stone-600">${esc(p.category || '-')}</td>
+                    <td class="p-4 text-muted">${esc(p.category || '-')}</td>
                     <td class="p-4 font-medium">${soles(p.price)}</td>
-                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded ${p.status === 'vendido' ? 'bg-stone-900 text-base-50' : p.status === 'reservado' ? 'bg-base-300 text-stone-800' : 'bg-base-200 text-stone-700'}">${esc(p.status)}</span></td>
-                    <td class="p-4 text-right whitespace-nowrap">
+                    <td class="p-4">${badgeEstado(p.status)}</td>
+                    <td class="p-4 pr-6 text-right whitespace-nowrap">
                         <div class="inline-flex gap-2">
                             ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${esc(p.id)}')" class="btn btn-secondary btn-sm">${icon('check', 'w-3.5 h-3.5')}Vendido</button>` : ''}
                             <button onclick="editarProducto('${esc(p.id)}')" class="btn btn-secondary btn-sm">${icon('pencil', 'w-3.5 h-3.5')}Editar</button>
@@ -780,15 +958,15 @@
             const tbody = $('tabla-ventas-body');
             const { data } = await supabaseClient.from('sales').select('*, products(name)').order('created_at', { ascending: false });
             if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-stone-500">Aún no hay ventas registradas.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-muted">Aún no hay ventas registradas.</td></tr>';
                 return;
             }
             tbody.innerHTML = data.map(v => `
-                <tr class="hover:bg-base-100">
-                    <td class="p-4 text-stone-600">${new Date(v.created_at).toLocaleDateString()}</td>
+                <tr class="hover:bg-soft/60">
+                    <td class="p-4 pl-6 text-muted">${new Date(v.created_at).toLocaleDateString()}</td>
                     <td class="p-4 font-medium">${esc(v.products?.name || 'Pieza eliminada')}</td>
                     <td class="p-4 font-medium">${soles(v.sale_price)}</td>
-                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded bg-base-200 text-stone-700">${esc(v.status)}</span></td>
+                    <td class="p-4 pr-6"><span class="badge bg-soft text-muted">${esc(v.status)}</span></td>
                 </tr>
             `).join('');
         }
