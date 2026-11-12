@@ -22,7 +22,27 @@
         h1, h2, h3, h4 { line-height: 1.15; }
         .fade-in { animation: fadeIn 0.25s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+        /* Barras flotantes: mismo color del fondo, translúcidas, con blur que aumenta al desplazarse */
+        .barra-flotante {
+            background: rgba(239, 238, 236, .82);
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+            border: 1px solid rgba(120, 113, 108, .30);
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(28, 25, 23, .06);
+            transition: background-color .3s ease, box-shadow .3s ease, backdrop-filter .3s ease, -webkit-backdrop-filter .3s ease;
+        }
+        .barra-flotante.scrolled {
+            background: rgba(239, 238, 236, .66);
+            -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+            box-shadow: 0 10px 28px rgba(28, 25, 23, .13);
+        }
+        .nav-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 2.25rem; height: 2.25rem; border-radius: 3px; color: #57534e; cursor: pointer;
+            transition: background-color .2s ease, color .2s ease;
+        }
+        .nav-icon:hover { background: rgba(28, 25, 23, .08); }
+        .nav-icon-on, .nav-icon-on:hover { background: #1c1917; color: #f8f8f7; }
 
         /* Botones: relleno sólido por defecto, blur al pasar el mouse */
         .btn, .chip, .icon-btn {
@@ -30,14 +50,14 @@
             font-weight: 500; font-size: .875rem; line-height: 1; cursor: pointer;
             transition: background-color .25s ease, backdrop-filter .25s ease, -webkit-backdrop-filter .25s ease, box-shadow .25s ease;
         }
-        .btn { padding: .65rem 1.1rem; border-radius: .6rem; border: 1px solid transparent; }
+        .btn { padding: .65rem 1.1rem; border-radius: 4px; border: 1px solid transparent; }
         .btn-sm { padding: .45rem .75rem; font-size: .75rem; }
         .btn-primary { background: #1c1917; color: #f8f8f7; }
         .btn-secondary { background: #e3e1de; color: #1c1917; border-color: #cdcac4; }
         .btn-danger { background: #f1dedc; color: #9b1c1c; border-color: #e2bdb9; }
-        .chip { padding: .5rem 1rem; border-radius: 9999px; background: #f8f8f7; color: #44403c; border: 1px solid #cdcac4; white-space: nowrap; }
+        .chip { padding: .5rem 1rem; border-radius: 4px; background: #f8f8f7; color: #44403c; border: 1px solid #cdcac4; white-space: nowrap; }
         .chip-on { background: #1c1917; color: #f8f8f7; border-color: #1c1917; }
-        .icon-btn { width: 2.5rem; height: 2.5rem; border-radius: 9999px; background: #f8f8f7; color: #1c1917; border: 1px solid #cdcac4; }
+        .icon-btn { width: 2.5rem; height: 2.5rem; border-radius: 4px; background: #f8f8f7; color: #1c1917; border: 1px solid #cdcac4; }
         .btn-primary:not(:disabled):hover, .chip-on:hover { background: rgba(28, 25, 23, .82); }
         .btn-secondary:not(:disabled):hover { background: rgba(227, 225, 222, .72); }
         .btn-danger:not(:disabled):hover { background: rgba(241, 222, 220, .72); }
@@ -50,7 +70,7 @@
         button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, label:focus-within { outline: 2px solid #1c1917; outline-offset: 2px; }
         #filtros-categorias { scrollbar-width: none; }
         #filtros-categorias::-webkit-scrollbar { display: none; }
-        .field { width: 100%; padding: .65rem .75rem; border-radius: .5rem; border: 1px solid #cdcac4; background: #f8f8f7; }
+        .field { width: 100%; padding: .65rem .75rem; border-radius: 4px; border: 1px solid #cdcac4; background: #f8f8f7; }
         .field:focus { border-color: #1c1917; outline: none; }
         @media (prefers-reduced-motion: reduce) {
             .fade-in { animation: none; }
@@ -60,18 +80,18 @@
 </head>
 <body class="text-stone-900 min-h-screen">
 
-    <!-- Header -->
-    <header class="sticky top-0 z-30 bg-base-300 border-b border-stone-400/60">
-        <div class="max-w-[1400px] mx-auto px-5 py-5 flex items-center gap-6">
+    <!-- Header flotante -->
+    <div class="sticky top-0 z-30 px-3 sm:px-5 pt-3 pointer-events-none">
+        <header class="barra-flotante pointer-events-auto max-w-[1400px] mx-auto px-5 py-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-between sm:gap-6">
             <div class="cursor-pointer shrink-0" onclick="cambiarVista('catalogo')">
-                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-9 sm:h-12 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
+                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-12 sm:h-12 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
             </div>
-            <!-- Categorías a la derecha -->
-            <div id="filtros-categorias" class="flex-1 flex justify-end gap-2 overflow-x-auto"></div>
-        </div>
-    </header>
+            <!-- Categorías: bajo el logo en móvil (deslizable), a la derecha en escritorio -->
+            <div id="filtros-categorias" class="w-full sm:flex-1 min-w-0 overflow-x-auto"></div>
+        </header>
+    </div>
 
-    <main class="max-w-[1400px] mx-auto px-5 pt-10 pb-36">
+    <main class="max-w-[1400px] mx-auto px-5 pt-8 pb-24">
 
         <!-- CATÁLOGO PÚBLICO -->
         <section id="vista-catalogo" class="fade-in">
@@ -83,7 +103,7 @@
         <!-- PANEL ADMIN -->
         <section id="vista-admin" class="hidden space-y-8 fade-in">
             <!-- Login -->
-            <div id="admin-login" class="max-w-sm mx-auto bg-base-50 border border-base-300 rounded-xl p-7 space-y-6">
+            <div id="admin-login" class="max-w-sm mx-auto bg-base-50 border border-base-300 rounded p-7 space-y-6">
                 <div class="text-center space-y-1">
                     <h2 class="text-xl font-semibold">Acceso administrador</h2>
                     <p class="text-sm text-stone-500">Ingresa con tu correo y contraseña.</p>
@@ -126,7 +146,7 @@
                             <button onclick="abrirModalProducto()" class="btn btn-primary"><span data-icon="plus"></span>Nuevo producto</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto border border-base-300 rounded-xl bg-base-50">
+                    <div class="overflow-x-auto border border-base-300 rounded bg-base-50">
                         <table class="w-full text-left border-collapse min-w-[760px]">
                             <thead>
                                 <tr class="border-b border-base-300 text-xs text-stone-500">
@@ -146,7 +166,7 @@
                 <!-- Ventas -->
                 <div id="panel-ventas" class="hidden space-y-4">
                     <h3 class="text-base font-semibold">Registro de ventas</h3>
-                    <div class="overflow-x-auto border border-base-300 rounded-xl bg-base-50">
+                    <div class="overflow-x-auto border border-base-300 rounded bg-base-50">
                         <table class="w-full text-left border-collapse min-w-[480px]">
                             <thead>
                                 <tr class="border-b border-base-300 text-xs text-stone-500">
@@ -164,17 +184,15 @@
         </section>
     </main>
 
-    <!-- Navegación inferior -->
-    <nav class="fixed bottom-0 inset-x-0 z-40 bg-base-300 border-t border-stone-400/60 pt-4 pb-safe">
-        <div class="flex justify-center gap-3">
-            <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="chip chip-on"><span data-icon="grid"></span>Catálogo</button>
-            <button onclick="cambiarVista('admin')" id="btn-admin" class="chip"><span data-icon="sliders"></span>Panel</button>
-        </div>
+    <!-- Selector flotante (solo para ti): Catálogo / Panel -->
+    <nav class="barra-flotante fixed z-40 p-1 flex gap-1" style="right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom));" aria-label="Cambiar de vista">
+        <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="nav-icon nav-icon-on" title="Catálogo" aria-label="Catálogo"><span data-icon="grid" data-cls="w-[18px] h-[18px]"></span></button>
+        <button onclick="cambiarVista('admin')" id="btn-admin" class="nav-icon" title="Panel" aria-label="Panel"><span data-icon="sliders" data-cls="w-[18px] h-[18px]"></span></button>
     </nav>
 
     <!-- Modal producto -->
     <div id="modal-producto" class="fixed inset-0 bg-stone-900/50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-base-50 w-full max-w-lg rounded-xl p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+        <div class="bg-base-50 w-full max-w-lg rounded p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <h3 id="modal-titulo" class="text-lg font-semibold">Nuevo producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
@@ -226,7 +244,7 @@
 
     <!-- Modal edición en masa -->
     <div id="modal-masivo" class="fixed inset-0 bg-stone-900/50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-base-50 w-full max-w-lg rounded-xl p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+        <div class="bg-base-50 w-full max-w-lg rounded p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <div class="space-y-1">
                 <h3 id="masivo-titulo" class="text-lg font-semibold">Editar selección</h3>
                 <p class="text-sm text-stone-500">Se aplicará a todos los productos seleccionados. Los campos que dejes vacíos no se modifican.</p>
@@ -270,7 +288,7 @@
     <!-- Zoom de imagen -->
     <div id="modal-zoom" class="fixed inset-0 bg-stone-900/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
         <button onclick="cerrarZoom()" aria-label="Cerrar imagen" class="icon-btn fixed top-4 right-4 w-11 h-11 shadow-md"><span data-icon="x" data-cls="w-5 h-5"></span></button>
-        <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[80vh] rounded-lg object-contain" onclick="event.stopPropagation()">
+        <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[80vh] rounded object-contain" onclick="event.stopPropagation()">
         <p class="fixed bottom-6 inset-x-0 text-center text-sm text-base-100">Presiona Esc o toca afuera para cerrar</p>
     </div>
 
@@ -327,6 +345,13 @@
             configurarEventosEditorFotos();
         });
 
+        function actualizarBarrasScroll() {
+            const activo = window.scrollY > 8;
+            document.querySelectorAll('.barra-flotante').forEach(b => b.classList.toggle('scrolled', activo));
+        }
+        window.addEventListener('scroll', actualizarBarrasScroll, { passive: true });
+        actualizarBarrasScroll();
+
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape') return;
             cerrarZoom();
@@ -371,8 +396,8 @@
             $('vista-catalogo').classList.toggle('hidden', !enCatalogo);
             $('vista-admin').classList.toggle('hidden', enCatalogo);
             $('filtros-categorias').classList.toggle('hidden', !enCatalogo);
-            $('btn-catalogo').className = 'chip' + (enCatalogo ? ' chip-on' : '');
-            $('btn-admin').className = 'chip' + (enCatalogo ? '' : ' chip-on');
+            $('btn-catalogo').className = 'nav-icon' + (enCatalogo ? ' nav-icon-on' : '');
+            $('btn-admin').className = 'nav-icon' + (enCatalogo ? '' : ' nav-icon-on');
             if (enCatalogo) cargarCatalogoPublico(); else verificarSesionReal();
             window.scrollTo({ top: 0 });
         }
@@ -393,11 +418,11 @@
         function actualizarFiltrosCategorias() {
             const categorias = ['todos', ...new Set(productosGlobal.map(p => p.category).filter(Boolean))];
             const cont = $('filtros-categorias');
-            cont.innerHTML = categorias.map(cat => `
+            cont.innerHTML = '<div class="flex w-max gap-2 mx-auto sm:mx-0 sm:ml-auto">' + categorias.map(cat => `
                 <button data-cat="${esc(cat)}" class="chip ${categoriaActual === cat ? 'chip-on' : ''}">
                     ${esc(cat === 'todos' ? 'Todas' : cat.charAt(0).toUpperCase() + cat.slice(1))}
                 </button>
-            `).join('');
+            `).join('') + '</div>';
             cont.querySelectorAll('button').forEach(b => b.addEventListener('click', () => filtrarCategoria(b.dataset.cat)));
         }
 
@@ -434,18 +459,18 @@
                 carruselIndices[p.id] = idx;
 
                 const badge = p.status === 'vendido' || p.status === 'reservado'
-                    ? `<span class="absolute top-3 left-3 z-10 bg-base-50 text-stone-900 text-xs font-medium px-3 py-1.5 rounded-full border border-base-300">${p.status === 'vendido' ? 'Vendido' : 'Reservado'}</span>` : '';
+                    ? `<span class="absolute top-3 left-3 z-10 bg-base-50 text-stone-900 text-xs font-medium px-3 py-1.5 rounded border border-base-300">${p.status === 'vendido' ? 'Vendido' : 'Reservado'}</span>` : '';
 
                 const controles = fotos.length > 1 ? `
                     <button data-prev="${esc(p.id)}" aria-label="Foto anterior" class="icon-btn absolute left-3 top-1/2 -translate-y-1/2 z-10">${icon('left', 'w-5 h-5')}</button>
                     <button data-next="${esc(p.id)}" aria-label="Foto siguiente" class="icon-btn absolute right-3 top-1/2 -translate-y-1/2 z-10">${icon('right', 'w-5 h-5')}</button>
-                    <div id="cnt-${esc(p.id)}" class="absolute bottom-3 right-3 bg-base-50 text-stone-900 text-xs font-medium px-2.5 py-1 rounded-full border border-base-300 z-10">${idx + 1}/${fotos.length}</div>` : '';
+                    <div id="cnt-${esc(p.id)}" class="absolute bottom-3 right-3 bg-base-50 text-stone-900 text-xs font-medium px-2.5 py-1 rounded border border-base-300 z-10">${idx + 1}/${fotos.length}</div>` : '';
 
                 // Todas las fotos se cargan de entrada dentro del carrusel: al deslizar ya están listas.
                 const slides = fotos.map(f => `<img src="${esc(f)}" alt="${esc(p.name)}" data-zoom="${esc(f)}" draggable="false" class="w-full h-full flex-none object-cover cursor-zoom-in">`).join('');
 
                 return `
-                    <article class="flex flex-col bg-base-50 border border-base-300 rounded-xl overflow-hidden">
+                    <article class="flex flex-col bg-base-50 border border-base-300 rounded overflow-hidden">
                         <div class="relative aspect-square overflow-hidden bg-base-200 select-none" data-carrusel="${esc(p.id)}">
                             <div id="track-${esc(p.id)}" class="track flex h-full transition-transform duration-500 ease-out" style="transform: translateX(-${idx * 100}%)">${slides}</div>
                             ${badge}
@@ -532,12 +557,12 @@
             const cont = $('editor-fotos');
             $('editor-ayuda').classList.toggle('hidden', fotosEditor.length === 0);
             cont.innerHTML = fotosEditor.map((f, i) => `
-                <div class="relative aspect-square rounded-lg overflow-hidden bg-base-200 border-2 ${i === principalIdx ? 'border-stone-900' : 'border-transparent'}">
+                <div class="relative aspect-square rounded overflow-hidden bg-base-200 border-2 ${i === principalIdx ? 'border-stone-900' : 'border-transparent'}">
                     <button type="button" data-principal="${i}" class="absolute inset-0 w-full h-full" aria-label="Marcar como foto principal">
                         <img src="${esc(f.preview)}" alt="" class="w-full h-full object-cover">
                     </button>
-                    ${i === principalIdx ? `<span class="absolute bottom-1 left-1 inline-flex items-center gap-1 bg-stone-900 text-base-50 text-[10px] font-medium px-1.5 py-1 rounded-md pointer-events-none">${icon('star', 'w-3 h-3', true)}Principal</span>` : ''}
-                    <button type="button" data-quitar="${i}" aria-label="Quitar foto" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-base-50 text-stone-900 border border-base-300 flex items-center justify-center">${icon('x', 'w-3.5 h-3.5')}</button>
+                    ${i === principalIdx ? `<span class="absolute bottom-1 left-1 inline-flex items-center gap-1 bg-stone-900 text-base-50 text-[10px] font-medium px-1.5 py-1 rounded pointer-events-none">${icon('star', 'w-3 h-3', true)}Principal</span>` : ''}
+                    <button type="button" data-quitar="${i}" aria-label="Quitar foto" class="absolute top-1 right-1 w-6 h-6 rounded bg-base-50 text-stone-900 border border-base-300 flex items-center justify-center">${icon('x', 'w-3.5 h-3.5')}</button>
                 </div>
             `).join('');
         }
@@ -615,13 +640,13 @@
                     <td class="p-4"><input type="checkbox" class="chk-fila accent-stone-900 w-4 h-4" data-id="${esc(p.id)}" ${sel ? 'checked' : ''} aria-label="Seleccionar ${esc(p.name)}"></td>
                     <td class="p-4">
                         <div class="flex items-center gap-3">
-                            <img src="${esc(fotosReales(p)[0] || 'https://via.placeholder.com/48')}" alt="" class="w-12 h-12 rounded-lg object-cover border border-base-300">
+                            <img src="${esc(fotosReales(p)[0] || 'https://via.placeholder.com/48')}" alt="" class="w-12 h-12 rounded object-cover border border-base-300">
                             <span class="font-medium">${esc(p.name)}</span>
                         </div>
                     </td>
                     <td class="p-4 text-stone-600">${esc(p.category || '-')}</td>
                     <td class="p-4 font-medium">${soles(p.price)}</td>
-                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-full ${p.status === 'vendido' ? 'bg-stone-900 text-base-50' : p.status === 'reservado' ? 'bg-base-300 text-stone-800' : 'bg-base-200 text-stone-700'}">${esc(p.status)}</span></td>
+                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded ${p.status === 'vendido' ? 'bg-stone-900 text-base-50' : p.status === 'reservado' ? 'bg-base-300 text-stone-800' : 'bg-base-200 text-stone-700'}">${esc(p.status)}</span></td>
                     <td class="p-4 text-right whitespace-nowrap">
                         <div class="inline-flex gap-2">
                             ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${esc(p.id)}')" class="btn btn-secondary btn-sm">${icon('check', 'w-3.5 h-3.5')}Vendido</button>` : ''}
@@ -763,7 +788,7 @@
                     <td class="p-4 text-stone-600">${new Date(v.created_at).toLocaleDateString()}</td>
                     <td class="p-4 font-medium">${esc(v.products?.name || 'Pieza eliminada')}</td>
                     <td class="p-4 font-medium">${soles(v.sale_price)}</td>
-                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-full bg-base-200 text-stone-700">${esc(v.status)}</span></td>
+                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded bg-base-200 text-stone-700">${esc(v.status)}</span></td>
                 </tr>
             `).join('');
         }
