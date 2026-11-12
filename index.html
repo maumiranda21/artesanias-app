@@ -5,32 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>creatiyés | Catálogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { cream: { 50: '#fdfaf2', 100: '#f8f3e7', 200: '#eee6d2' } } } } };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.01em;
+            background-color: #f8f3e7;
+            background-image: radial-gradient(rgba(120, 100, 70, 0.22) 1px, transparent 1px);
+            background-size: 18px 18px;
+        }
         h1, h2, h3, h4 { line-height: 1.15; }
         .fade-in { animation: fadeIn 0.25s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }
+        /* Efecto blur al pasar el mouse por los botones */
+        .fx { transition: background-color .25s ease, backdrop-filter .25s ease, -webkit-backdrop-filter .25s ease, box-shadow .25s ease, color .25s ease; }
+        .fx:not(:disabled):hover { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(28, 25, 23, 0.12); }
         button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #1c1917; outline-offset: 2px; }
         .pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+        #filtros-categorias { scrollbar-width: none; }
+        #filtros-categorias::-webkit-scrollbar { display: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .fade-in { animation: none; }
+            .track { transition: none !important; }
+        }
     </style>
 </head>
-<body class="bg-white text-stone-900 min-h-screen">
+<body class="text-stone-900 min-h-screen">
 
-    <!-- Logo centrado -->
-    <header class="pt-10 pb-6 flex justify-center">
-        <div class="cursor-pointer" onclick="cambiarVista('catalogo')">
-            <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-16 sm:h-20 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-cream-50/90 backdrop-blur border-b border-stone-300">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+            <div class="cursor-pointer shrink-0" onclick="cambiarVista('catalogo')">
+                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-11 sm:h-14 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
+            </div>
+            <!-- Categorías a la derecha -->
+            <div id="filtros-categorias" class="flex-1 flex justify-end gap-x-5 overflow-x-auto whitespace-nowrap"></div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 pb-28">
+    <main class="max-w-6xl mx-auto px-4 pt-10 pb-28">
 
         <!-- CATÁLOGO PÚBLICO -->
-        <section id="vista-catalogo" class="space-y-10 fade-in">
-            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2" id="filtros-categorias"></div>
+        <section id="vista-catalogo" class="fade-in">
             <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
                 <div class="col-span-full text-center py-16 text-stone-400 text-sm">Cargando piezas…</div>
             </div>
@@ -47,41 +67,46 @@
                 <form onsubmit="iniciarSesionAdmin(event)" class="space-y-4">
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="login-email">Correo electrónico</label>
-                        <input type="email" id="login-email" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
+                        <input type="email" id="login-email" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="login-password">Contraseña</label>
-                        <input type="password" id="login-password" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
+                        <input type="password" id="login-password" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
                     </div>
-                    <button type="submit" class="w-full py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition">Iniciar sesión</button>
+                    <button type="submit" class="fx w-full py-3 bg-stone-900/90 text-cream-50 text-sm font-medium rounded-md hover:bg-stone-900/75">Iniciar sesión</button>
                 </form>
             </div>
 
             <!-- Dashboard -->
             <div id="admin-dashboard" class="hidden space-y-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-stone-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-stone-300">
                     <div>
                         <h2 class="text-xl font-semibold">Panel de control</h2>
                         <p class="text-sm text-stone-500" id="admin-user-email"></p>
                     </div>
-                    <button onclick="cerrarSesionAdmin()" class="px-4 py-2 text-sm border border-stone-300 rounded-md hover:bg-stone-50 transition">Cerrar sesión</button>
+                    <button onclick="cerrarSesionAdmin()" class="fx px-4 py-2 text-sm border border-stone-400 rounded-md hover:bg-cream-50/60">Cerrar sesión</button>
                 </div>
 
-                <div class="flex space-x-6 border-b border-stone-200">
+                <div class="flex space-x-6 border-b border-stone-300">
                     <button onclick="cambiarPestanaAdmin('inventario')" id="tab-inventario" class="pb-3 -mb-px border-b-2 border-stone-900 font-semibold text-sm">Inventario</button>
                     <button onclick="cambiarPestanaAdmin('ventas')" id="tab-ventas" class="pb-3 -mb-px border-b-2 border-transparent text-stone-500 hover:text-stone-900 text-sm">Ventas</button>
                 </div>
 
                 <!-- Inventario -->
                 <div id="panel-inventario" class="space-y-4">
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-wrap justify-between items-center gap-3">
                         <h3 class="text-base font-semibold">Inventario</h3>
-                        <button onclick="abrirModalProducto()" class="px-4 py-2 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition">Nuevo producto</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="btn-sel-todos" onclick="alternarSeleccionTodos()" class="fx px-4 py-2 text-sm border border-stone-400 rounded-md hover:bg-cream-50/60">Seleccionar todos</button>
+                            <button id="btn-editar-masivo" onclick="abrirModalMasivo()" class="fx hidden px-4 py-2 text-sm font-medium bg-stone-900/90 text-cream-50 rounded-md hover:bg-stone-900/75">Editar selección</button>
+                            <button onclick="abrirModalProducto()" class="fx px-4 py-2 bg-stone-900/90 text-cream-50 text-sm font-medium rounded-md hover:bg-stone-900/75">Nuevo producto</button>
+                        </div>
                     </div>
-                    <div class="overflow-x-auto border border-stone-200 rounded-md">
-                        <table class="w-full text-left border-collapse min-w-[640px]">
+                    <div class="overflow-x-auto border border-stone-300 rounded-md bg-cream-50">
+                        <table class="w-full text-left border-collapse min-w-[700px]">
                             <thead>
-                                <tr class="border-b border-stone-200 text-xs text-stone-500">
+                                <tr class="border-b border-stone-300 text-xs text-stone-500">
+                                    <th class="p-4 w-10"><input type="checkbox" id="chk-todos" class="accent-stone-900 w-4 h-4" aria-label="Seleccionar todos"></th>
                                     <th class="p-4 font-medium">Pieza</th>
                                     <th class="p-4 font-medium">Categoría</th>
                                     <th class="p-4 font-medium">Precio</th>
@@ -89,7 +114,7 @@
                                     <th class="p-4 font-medium text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-inventario-body" class="divide-y divide-stone-100 text-sm"></tbody>
+                            <tbody id="tabla-inventario-body" class="divide-y divide-stone-200 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -97,17 +122,17 @@
                 <!-- Ventas -->
                 <div id="panel-ventas" class="hidden space-y-4">
                     <h3 class="text-base font-semibold">Registro de ventas</h3>
-                    <div class="overflow-x-auto border border-stone-200 rounded-md">
+                    <div class="overflow-x-auto border border-stone-300 rounded-md bg-cream-50">
                         <table class="w-full text-left border-collapse min-w-[480px]">
                             <thead>
-                                <tr class="border-b border-stone-200 text-xs text-stone-500">
+                                <tr class="border-b border-stone-300 text-xs text-stone-500">
                                     <th class="p-4 font-medium">Fecha</th>
                                     <th class="p-4 font-medium">Producto</th>
                                     <th class="p-4 font-medium">Precio final</th>
                                     <th class="p-4 font-medium">Estado</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-ventas-body" class="divide-y divide-stone-100 text-sm"></tbody>
+                            <tbody id="tabla-ventas-body" class="divide-y divide-stone-200 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -116,68 +141,110 @@
     </main>
 
     <!-- Navegación inferior -->
-    <nav class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-stone-200 pt-3 pb-safe">
+    <nav class="fixed bottom-0 inset-x-0 z-40 bg-cream-50/90 backdrop-blur border-t border-stone-300 pt-3 pb-safe">
         <div class="flex justify-center space-x-10">
-            <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="text-sm font-semibold text-stone-900 border-b-2 border-stone-900 pb-1 transition">Catálogo</button>
-            <button onclick="cambiarVista('admin')" id="btn-admin" class="text-sm font-medium text-stone-500 border-b-2 border-transparent pb-1 hover:text-stone-900 transition">Panel</button>
+            <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="text-sm font-semibold text-stone-900 border-b-2 border-stone-900 pb-1">Catálogo</button>
+            <button onclick="cambiarVista('admin')" id="btn-admin" class="text-sm font-medium text-stone-500 border-b-2 border-transparent pb-1 hover:text-stone-900">Panel</button>
         </div>
     </nav>
 
     <!-- Modal producto -->
-    <div id="modal-producto" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-lg rounded-lg p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+    <div id="modal-producto" class="fixed inset-0 bg-stone-900/40 hidden items-center justify-center z-50 p-4">
+        <div class="bg-cream-50 w-full max-w-lg rounded-lg p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
             <h3 id="modal-titulo" class="text-lg font-semibold">Nuevo producto</h3>
             <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id">
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-fotos">Fotografías</label>
-                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="analizarNombreArchivoIA(event)" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200">
+                    <input type="file" id="prod-fotos" multiple accept="image/*" onchange="analizarNombreArchivoIA(event)" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-cream-200 file:text-stone-700 hover:file:bg-stone-200">
                     <p id="ia-estado" class="text-xs text-stone-400 mt-1.5 hidden">Leyendo nombre de archivo…</p>
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-nombre">Nombre</label>
-                    <input type="text" id="prod-nombre" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
+                    <input type="text" id="prod-nombre" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm text-stone-600 mb-1" for="prod-categoria">Categoría</label>
-                        <input type="text" id="prod-categoria" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
+                        <input type="text" id="prod-categoria" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm text-stone-600 mb-1" for="prod-precio">Precio</label>
-                        <input type="number" step="0.01" id="prod-precio" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
+                        <label class="block text-sm text-stone-600 mb-1" for="prod-precio">Precio (S/)</label>
+                        <input type="number" step="0.01" id="prod-precio" required class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-coleccion">Colección (opcional)</label>
-                    <input type="text" id="prod-coleccion" class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none">
+                    <input type="text" id="prod-coleccion" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-descripcion">Descripción</label>
-                    <textarea id="prod-descripcion" rows="3" class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none"></textarea>
+                    <textarea id="prod-descripcion" rows="3" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm text-stone-600 mb-1" for="prod-estado">Estado</label>
-                    <select id="prod-estado" class="w-full px-3 py-2.5 rounded-md border border-stone-300 focus:border-stone-900 focus:outline-none bg-white">
+                    <select id="prod-estado" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
                         <option value="disponible">Disponible</option>
                         <option value="reservado">Reservado</option>
                         <option value="vendido">Vendido</option>
                     </select>
                 </div>
-                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-100">
-                    <button type="button" onclick="cerrarModalProducto()" class="px-5 py-2.5 border border-stone-300 rounded-md text-sm text-stone-600 hover:bg-stone-50 transition">Cancelar</button>
-                    <button type="submit" id="btn-guardar-prod" class="px-6 py-2.5 bg-stone-900 text-white rounded-md text-sm font-medium hover:bg-stone-700 transition disabled:opacity-60">Guardar producto</button>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
+                    <button type="button" onclick="cerrarModalProducto()" class="fx px-5 py-2.5 border border-stone-400 rounded-md text-sm text-stone-600 hover:bg-cream-200/60">Cancelar</button>
+                    <button type="submit" id="btn-guardar-prod" class="fx px-6 py-2.5 bg-stone-900/90 text-cream-50 rounded-md text-sm font-medium hover:bg-stone-900/75 disabled:opacity-60">Guardar producto</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal zoom -->
-    <div id="modal-zoom" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
-        <div class="relative max-w-4xl max-h-[90vh]">
-            <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[85vh] rounded-md object-contain">
-            <button class="absolute top-3 right-3 bg-white/20 hover:bg-white/40 text-white text-xl w-10 h-10 rounded-full flex items-center justify-center transition" aria-label="Cerrar">×</button>
+    <!-- Modal edición en masa -->
+    <div id="modal-masivo" class="fixed inset-0 bg-stone-900/40 hidden items-center justify-center z-50 p-4">
+        <div class="bg-cream-50 w-full max-w-lg rounded-lg p-7 space-y-5 shadow-xl max-h-[90vh] overflow-y-auto fade-in">
+            <div class="space-y-1">
+                <h3 id="masivo-titulo" class="text-lg font-semibold">Editar selección</h3>
+                <p class="text-sm text-stone-500">Se aplicará a todos los productos seleccionados. Los campos que dejes vacíos no se modifican.</p>
+            </div>
+            <form id="form-masivo" onsubmit="guardarMasivo(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-stone-600 mb-1" for="mas-categoria">Categoría</label>
+                        <input type="text" id="mas-categoria" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-stone-600 mb-1" for="mas-precio">Precio (S/)</label>
+                        <input type="number" step="0.01" id="mas-precio" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-stone-600 mb-1" for="mas-coleccion">Colección</label>
+                    <input type="text" id="mas-coleccion" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm text-stone-600 mb-1" for="mas-descripcion">Descripción</label>
+                    <textarea id="mas-descripcion" rows="3" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-stone-600 mb-1" for="mas-estado">Estado</label>
+                    <select id="mas-estado" class="w-full px-3 py-2.5 rounded-md border border-stone-300 bg-cream-50 focus:border-stone-900 focus:outline-none">
+                        <option value="">No cambiar</option>
+                        <option value="disponible">Disponible</option>
+                        <option value="reservado">Reservado</option>
+                        <option value="vendido">Vendido</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-200">
+                    <button type="button" onclick="cerrarModalMasivo()" class="fx px-5 py-2.5 border border-stone-400 rounded-md text-sm text-stone-600 hover:bg-cream-200/60">Cancelar</button>
+                    <button type="submit" id="btn-guardar-masivo" class="fx px-6 py-2.5 bg-stone-900/90 text-cream-50 rounded-md text-sm font-medium hover:bg-stone-900/75 disabled:opacity-60">Aplicar cambios</button>
+                </div>
+            </form>
         </div>
+    </div>
+
+    <!-- Zoom de imagen -->
+    <div id="modal-zoom" class="fixed inset-0 bg-stone-900/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
+        <button onclick="cerrarZoom()" aria-label="Cerrar imagen" class="fx fixed top-4 right-4 w-11 h-11 rounded-full bg-cream-50 text-stone-900 border border-stone-300 text-2xl leading-none flex items-center justify-center shadow-md hover:bg-cream-50/70">×</button>
+        <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[80vh] rounded-md object-contain" onclick="event.stopPropagation()">
+        <p class="fixed bottom-6 inset-x-0 text-center text-sm text-cream-100">Presiona Esc o toca afuera para cerrar</p>
     </div>
 
     <script>
@@ -185,18 +252,35 @@
         const SUPABASE_KEY = 'sb_publishable_OVwdEUSZNt9en94i-g-Ulw_QuwLT901';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // ⚠️ Escribe aquí tu número de WhatsApp con código de país y sin "+" ni espacios.
+        // Ejemplo Perú: '51987654321'. Mientras tenga las X, se usa el enlace wa.link (sin mensaje automático).
+        const WHATSAPP_NUMERO = '51956763529';
+        const WHATSAPP_LINK_RESPALDO = 'https://wa.link/3qk34n';
+
         let productosGlobal = [];
+        let inventarioGlobal = [];
         let categoriaActual = 'todos';
         let carruselIndices = {};
+        const seleccionados = new Set();
 
         const $ = (id) => document.getElementById(id);
         const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const soles = (n) => 'S/ ' + Number(n || 0).toFixed(2);
 
         document.addEventListener('DOMContentLoaded', () => {
             verificarSesionReal();
             cargarCatalogoPublico();
+            configurarEventosCatalogo();
         });
 
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            cerrarZoom();
+            cerrarModalProducto();
+            cerrarModalMasivo();
+        });
+
+        /* ---------- Sesión ---------- */
         async function verificarSesionReal() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
@@ -213,31 +297,35 @@
 
         async function iniciarSesionAdmin(e) {
             e.preventDefault();
-            const email = $('login-email').value;
-            const password = $('login-password').value;
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            const { error } = await supabaseClient.auth.signInWithPassword({
+                email: $('login-email').value,
+                password: $('login-password').value
+            });
             if (error) alert('Correo o contraseña incorrectos.');
             else verificarSesionReal();
         }
 
         async function cerrarSesionAdmin() {
             await supabaseClient.auth.signOut();
+            seleccionados.clear();
             verificarSesionReal();
             cambiarVista('catalogo');
         }
 
         function cambiarVista(vista) {
-            const activo = 'text-sm font-semibold text-stone-900 border-b-2 border-stone-900 pb-1 transition';
-            const inactivo = 'text-sm font-medium text-stone-500 border-b-2 border-transparent pb-1 hover:text-stone-900 transition';
+            const activo = 'text-sm font-semibold text-stone-900 border-b-2 border-stone-900 pb-1';
+            const inactivo = 'text-sm font-medium text-stone-500 border-b-2 border-transparent pb-1 hover:text-stone-900';
             if (vista === 'catalogo') {
                 $('vista-catalogo').classList.remove('hidden');
                 $('vista-admin').classList.add('hidden');
+                $('filtros-categorias').classList.remove('hidden');
                 $('btn-catalogo').className = activo;
                 $('btn-admin').className = inactivo;
                 cargarCatalogoPublico();
             } else {
                 $('vista-catalogo').classList.add('hidden');
                 $('vista-admin').classList.remove('hidden');
+                $('filtros-categorias').classList.add('hidden');
                 $('btn-admin').className = activo;
                 $('btn-catalogo').className = inactivo;
                 verificarSesionReal();
@@ -245,6 +333,7 @@
             window.scrollTo({ top: 0 });
         }
 
+        /* ---------- Catálogo ---------- */
         async function cargarCatalogoPublico() {
             const grid = $('grid-productos');
             const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
@@ -259,12 +348,13 @@
 
         function actualizarFiltrosCategorias() {
             const categorias = ['todos', ...new Set(productosGlobal.map(p => p.category).filter(Boolean))];
-            $('filtros-categorias').innerHTML = categorias.map(cat => `
-                <button data-cat="${esc(cat)}" class="text-sm pb-1 border-b-2 transition ${categoriaActual === cat ? 'border-stone-900 text-stone-900 font-semibold' : 'border-transparent text-stone-500 hover:text-stone-900'}">
+            const cont = $('filtros-categorias');
+            cont.innerHTML = categorias.map(cat => `
+                <button data-cat="${esc(cat)}" class="text-sm pb-1 border-b-2 ${categoriaActual === cat ? 'border-stone-900 text-stone-900 font-semibold' : 'border-transparent text-stone-500 hover:text-stone-900'}">
                     ${esc(cat === 'todos' ? 'Todas' : cat.charAt(0).toUpperCase() + cat.slice(1))}
                 </button>
             `).join('');
-            $('filtros-categorias').querySelectorAll('button').forEach(b => b.addEventListener('click', () => filtrarCategoria(b.dataset.cat)));
+            cont.querySelectorAll('button').forEach(b => b.addEventListener('click', () => filtrarCategoria(b.dataset.cat)));
         }
 
         function filtrarCategoria(cat) {
@@ -290,53 +380,86 @@
 
             grid.innerHTML = filtrados.map(p => {
                 const fotos = fotosDe(p);
-                if (carruselIndices[p.id] === undefined) carruselIndices[p.id] = 0;
-                let idx = carruselIndices[p.id];
+                let idx = carruselIndices[p.id] || 0;
                 if (idx >= fotos.length) idx = 0;
+                carruselIndices[p.id] = idx;
 
-                const badge = p.status === 'vendido' ? '<span class="absolute top-3 left-3 bg-white text-stone-900 text-xs font-medium px-2.5 py-1 rounded-md">Vendido</span>'
-                            : p.status === 'reservado' ? '<span class="absolute top-3 left-3 bg-white text-stone-900 text-xs font-medium px-2.5 py-1 rounded-md">Reservado</span>' : '';
+                const badge = p.status === 'vendido' ? '<span class="absolute top-3 left-3 z-10 bg-cream-50 text-stone-900 text-xs font-medium px-2.5 py-1 rounded-md">Vendido</span>'
+                            : p.status === 'reservado' ? '<span class="absolute top-3 left-3 z-10 bg-cream-50 text-stone-900 text-xs font-medium px-2.5 py-1 rounded-md">Reservado</span>' : '';
 
                 const controles = fotos.length > 1 ? `
-                    <button onclick="cambiarFoto('${esc(p.id)}', -1, event)" aria-label="Foto anterior" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-stone-900 w-8 h-8 rounded-full flex items-center justify-center z-20">‹</button>
-                    <button onclick="cambiarFoto('${esc(p.id)}', 1, event)" aria-label="Foto siguiente" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-stone-900 w-8 h-8 rounded-full flex items-center justify-center z-20">›</button>
-                    <div class="absolute bottom-3 right-3 bg-white/90 text-stone-900 text-xs px-2 py-0.5 rounded-md z-10">${idx + 1}/${fotos.length}</div>` : '';
+                    <button data-prev="${esc(p.id)}" aria-label="Foto anterior" class="fx absolute left-2 top-1/2 -translate-y-1/2 bg-cream-50/85 hover:bg-cream-50/60 text-stone-900 w-9 h-9 rounded-full flex items-center justify-center z-10 text-lg">‹</button>
+                    <button data-next="${esc(p.id)}" aria-label="Foto siguiente" class="fx absolute right-2 top-1/2 -translate-y-1/2 bg-cream-50/85 hover:bg-cream-50/60 text-stone-900 w-9 h-9 rounded-full flex items-center justify-center z-10 text-lg">›</button>
+                    <div id="cnt-${esc(p.id)}" class="absolute bottom-3 right-3 bg-cream-50/90 text-stone-900 text-xs px-2 py-0.5 rounded-md z-10">${idx + 1}/${fotos.length}</div>` : '';
+
+                // Todas las fotos se cargan desde el inicio dentro del carrusel, por eso al deslizar ya están listas.
+                const slides = fotos.map(f => `<img src="${esc(f)}" alt="${esc(p.name)}" data-zoom="${esc(f)}" draggable="false" class="w-full h-full flex-none object-cover cursor-zoom-in">`).join('');
 
                 return `
                     <article class="flex flex-col">
-                        <div class="relative aspect-[4/5] bg-stone-100 overflow-hidden rounded-md">
-                            <img src="${esc(fotos[idx])}" alt="${esc(p.name)}" class="w-full h-full object-cover cursor-zoom-in" onclick="abrirZoom('${esc(fotos[idx])}')">
+                        <div class="relative aspect-square overflow-hidden rounded-md bg-cream-200 select-none" data-carrusel="${esc(p.id)}">
+                            <div id="track-${esc(p.id)}" class="track flex h-full transition-transform duration-500 ease-out" style="transform: translateX(-${idx * 100}%)">${slides}</div>
                             ${badge}
                             ${controles}
                         </div>
                         <div class="pt-4 space-y-1">
-                            <p class="text-xs text-stone-400">${esc(p.category || 'General')}</p>
+                            <p class="text-xs text-stone-500">${esc(p.category || 'General')}</p>
                             <h3 class="text-base font-semibold">${esc(p.name)}</h3>
-                            <p class="text-sm text-stone-500 line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
+                            <p class="text-sm text-stone-600 line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
                             <div class="flex items-center justify-between pt-3">
-                                <span class="text-lg font-semibold">$ ${Number(p.price).toFixed(2)}</span>
-                                <button data-id="${esc(p.id)}" class="btn-quiero px-4 py-2 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-sm font-medium rounded-md transition">Quiero este</button>
+                                <span class="text-lg font-semibold">${soles(p.price)}</span>
+                                <button data-quiero="${esc(p.id)}" class="fx px-4 py-2 border border-stone-900 text-stone-900 hover:bg-stone-900/80 hover:text-cream-50 text-sm font-medium rounded-md">Quiero este</button>
                             </div>
                         </div>
                     </article>`;
             }).join('');
-
-            grid.querySelectorAll('.btn-quiero').forEach(b => b.addEventListener('click', () => {
-                const p = productosGlobal.find(x => String(x.id) === b.dataset.id);
-                if (p) accionQuieroEste(p);
-            }));
         }
 
-        function cambiarFoto(idProd, direccion, event) {
-            event.stopPropagation();
+        function configurarEventosCatalogo() {
+            const grid = $('grid-productos');
+
+            grid.addEventListener('click', (e) => {
+                const prev = e.target.closest('[data-prev]');
+                const next = e.target.closest('[data-next]');
+                const zoom = e.target.closest('[data-zoom]');
+                const quiero = e.target.closest('[data-quiero]');
+                if (prev) moverCarrusel(prev.dataset.prev, -1);
+                else if (next) moverCarrusel(next.dataset.next, 1);
+                else if (quiero) {
+                    const p = productosGlobal.find(x => String(x.id) === quiero.dataset.quiero);
+                    if (p) accionQuieroEste(p);
+                } else if (zoom) abrirZoom(zoom.dataset.zoom);
+            });
+
+            // Deslizar con el dedo en el celular
+            let inicioX = null, idCarrusel = null;
+            grid.addEventListener('touchstart', (e) => {
+                const c = e.target.closest('[data-carrusel]');
+                if (!c) { inicioX = null; return; }
+                idCarrusel = c.dataset.carrusel;
+                inicioX = e.touches[0].clientX;
+            }, { passive: true });
+            grid.addEventListener('touchend', (e) => {
+                if (inicioX === null) return;
+                const dx = e.changedTouches[0].clientX - inicioX;
+                if (Math.abs(dx) > 40) moverCarrusel(idCarrusel, dx < 0 ? 1 : -1);
+                inicioX = null;
+            }, { passive: true });
+        }
+
+        function moverCarrusel(idProd, direccion) {
             const p = productosGlobal.find(x => String(x.id) === String(idProd));
             if (!p) return;
             const total = fotosDe(p).length;
+            if (total < 2) return;
             let i = (carruselIndices[p.id] || 0) + direccion;
             if (i < 0) i = total - 1;
             if (i >= total) i = 0;
             carruselIndices[p.id] = i;
-            renderizarProductos();
+            const track = $(`track-${p.id}`);
+            if (track) track.style.transform = `translateX(-${i * 100}%)`;
+            const cnt = $(`cnt-${p.id}`);
+            if (cnt) cnt.textContent = `${i + 1}/${total}`;
         }
 
         function abrirZoom(url) {
@@ -350,18 +473,20 @@
         }
 
         function accionQuieroEste(p) {
-            const texto = `Hola, quiero este producto:\n- *${p.name}*\n- Categoría: ${p.category || '-'}\n- Precio: $${Number(p.price).toFixed(2)}\n- Descripción: ${p.description || ''}\n\n¿Está disponible?`;
-            const url = `https://wa.link/3qk34n?text=${encodeURIComponent(texto)}`;
-            const abrir = () => window.open(url, '_blank');
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(texto).then(() => {
-                    alert('Información copiada. Se abrirá WhatsApp para que envíes el mensaje.');
-                    abrir();
-                }).catch(abrir);
-            } else abrir();
+            const foto = fotosDe(p)[0];
+            const texto = `Hola, quiero este producto:\n- *${p.name}*\n- Categoría: ${p.category || '-'}\n- Precio: ${soles(p.price)}\n- Descripción: ${p.description || '-'}\n- Foto: ${foto}\n\n¿Está disponible?`;
+            const numeroValido = /^\d{8,15}$/.test(WHATSAPP_NUMERO);
+
+            if (numeroValido) {
+                window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`, '_blank');
+            } else {
+                // Respaldo: el enlace corto no admite mensaje, así que se copia al portapapeles
+                if (navigator.clipboard) navigator.clipboard.writeText(texto).catch(() => {});
+                alert('Copiamos la información del producto. Pégala en el chat de WhatsApp.');
+                window.open(WHATSAPP_LINK_RESPALDO, '_blank');
+            }
         }
 
-        // Autocompleta nombre/descr. a partir del nombre del archivo
         function analizarNombreArchivoIA(e) {
             const files = e.target.files;
             if (!files || files.length === 0) return;
@@ -379,6 +504,7 @@
             }, 300);
         }
 
+        /* ---------- Admin ---------- */
         function cambiarPestanaAdmin(tab) {
             $('panel-inventario').classList.add('hidden');
             $('panel-ventas').classList.add('hidden');
@@ -389,38 +515,155 @@
         }
 
         async function cargarInventarioAdmin() {
-            const tbody = $('tabla-inventario-body');
             const { data } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-stone-400">Aún no hay productos. Agrega el primero con “Nuevo producto”.</td></tr>';
+            inventarioGlobal = data || [];
+            // Descarta selecciones de productos que ya no existen
+            const ids = new Set(inventarioGlobal.map(p => String(p.id)));
+            [...seleccionados].forEach(id => { if (!ids.has(id)) seleccionados.delete(id); });
+            renderizarInventario();
+        }
+
+        function renderizarInventario() {
+            const tbody = $('tabla-inventario-body');
+            if (inventarioGlobal.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-stone-400">Aún no hay productos. Agrega el primero con “Nuevo producto”.</td></tr>';
+                actualizarBarraSeleccion();
                 return;
             }
-            tbody.innerHTML = data.map(p => `
-                <tr class="hover:bg-stone-50">
+            tbody.innerHTML = inventarioGlobal.map(p => `
+                <tr class="${seleccionados.has(String(p.id)) ? 'bg-cream-200/60' : 'hover:bg-cream-100'}">
+                    <td class="p-4"><input type="checkbox" class="chk-fila accent-stone-900 w-4 h-4" data-id="${esc(p.id)}" ${seleccionados.has(String(p.id)) ? 'checked' : ''} aria-label="Seleccionar ${esc(p.name)}"></td>
                     <td class="p-4">
                         <div class="flex items-center space-x-3">
-                            <img src="${esc(p.main_image || (p.images && p.images[0]) || 'https://via.placeholder.com/40')}" alt="" class="w-12 h-12 rounded-md object-cover border border-stone-200">
+                            <img src="${esc(p.main_image || (p.images && p.images[0]) || 'https://via.placeholder.com/40')}" alt="" class="w-12 h-12 rounded-md object-cover border border-stone-300">
                             <span class="font-medium">${esc(p.name)}</span>
                         </div>
                     </td>
                     <td class="p-4 text-stone-600">${esc(p.category || '-')}</td>
-                    <td class="p-4 font-medium">$ ${Number(p.price).toFixed(2)}</td>
-                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-md ${p.status === 'vendido' ? 'bg-stone-900 text-white' : p.status === 'reservado' ? 'bg-stone-200 text-stone-800' : 'bg-stone-100 text-stone-600'}">${esc(p.status)}</span></td>
+                    <td class="p-4 font-medium">${soles(p.price)}</td>
+                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-md ${p.status === 'vendido' ? 'bg-stone-900 text-cream-50' : p.status === 'reservado' ? 'bg-stone-300 text-stone-800' : 'bg-cream-200 text-stone-700'}">${esc(p.status)}</span></td>
                     <td class="p-4 text-right space-x-2 whitespace-nowrap">
-                        ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${esc(p.id)}')" class="text-xs px-3 py-1.5 border border-stone-300 rounded-md hover:bg-stone-50">Marcar vendido</button>` : ''}
-                        <button onclick="editarProducto('${esc(p.id)}')" class="text-xs px-3 py-1.5 border border-stone-300 rounded-md hover:bg-stone-50">Editar</button>
-                        <button onclick="eliminarProducto('${esc(p.id)}')" class="text-xs px-3 py-1.5 border border-stone-300 text-red-600 rounded-md hover:bg-red-50">Eliminar</button>
+                        ${p.status !== 'vendido' ? `<button onclick="marcarComoVendido('${esc(p.id)}')" class="fx text-xs px-3 py-1.5 border border-stone-400 rounded-md hover:bg-cream-50/60">Marcar vendido</button>` : ''}
+                        <button onclick="editarProducto('${esc(p.id)}')" class="fx text-xs px-3 py-1.5 border border-stone-400 rounded-md hover:bg-cream-50/60">Editar</button>
+                        <button onclick="eliminarProducto('${esc(p.id)}')" class="fx text-xs px-3 py-1.5 border border-stone-400 text-red-700 rounded-md hover:bg-red-50/60">Eliminar</button>
                     </td>
                 </tr>
             `).join('');
+            actualizarBarraSeleccion();
         }
 
+        /* ---------- Selección múltiple ---------- */
+        $('tabla-inventario-body').addEventListener('change', (e) => {
+            const chk = e.target.closest('.chk-fila');
+            if (!chk) return;
+            if (chk.checked) seleccionados.add(chk.dataset.id);
+            else seleccionados.delete(chk.dataset.id);
+            renderizarInventario();
+        });
+
+        $('chk-todos').addEventListener('change', (e) => {
+            if (e.target.checked) inventarioGlobal.forEach(p => seleccionados.add(String(p.id)));
+            else seleccionados.clear();
+            renderizarInventario();
+        });
+
+        function alternarSeleccionTodos() {
+            const todos = inventarioGlobal.length > 0 && seleccionados.size === inventarioGlobal.length;
+            seleccionados.clear();
+            if (!todos) inventarioGlobal.forEach(p => seleccionados.add(String(p.id)));
+            renderizarInventario();
+        }
+
+        function actualizarBarraSeleccion() {
+            const n = seleccionados.size;
+            const total = inventarioGlobal.length;
+            const btn = $('btn-editar-masivo');
+            btn.classList.toggle('hidden', n === 0);
+            btn.textContent = `Editar selección (${n})`;
+            $('btn-sel-todos').textContent = (total > 0 && n === total) ? 'Quitar selección' : 'Seleccionar todos';
+            $('chk-todos').checked = total > 0 && n === total;
+            $('chk-todos').indeterminate = n > 0 && n < total;
+        }
+
+        /* ---------- Edición en masa ---------- */
+        function abrirModalMasivo() {
+            if (seleccionados.size === 0) return;
+            $('form-masivo').reset();
+            $('masivo-titulo').textContent = seleccionados.size === 1 ? 'Editar 1 producto' : `Editar ${seleccionados.size} productos`;
+            $('btn-guardar-masivo').disabled = false;
+            $('btn-guardar-masivo').textContent = 'Aplicar cambios';
+            $('modal-masivo').classList.remove('hidden');
+            $('modal-masivo').classList.add('flex');
+        }
+        function cerrarModalMasivo() {
+            $('modal-masivo').classList.add('hidden');
+            $('modal-masivo').classList.remove('flex');
+        }
+
+        async function guardarMasivo(e) {
+            e.preventDefault();
+            const btn = $('btn-guardar-masivo');
+            const cambios = {};
+            const categoria = $('mas-categoria').value.trim();
+            const precio = $('mas-precio').value;
+            const coleccion = $('mas-coleccion').value.trim();
+            const descripcion = $('mas-descripcion').value.trim();
+            const estado = $('mas-estado').value;
+
+            if (categoria) cambios.category = categoria;
+            if (precio !== '') cambios.price = parseFloat(precio);
+            if (coleccion) cambios.collection_name = coleccion;
+            if (descripcion) cambios.description = descripcion;
+            if (estado) cambios.status = estado;
+
+            if (Object.keys(cambios).length === 0) {
+                alert('Completa al menos un campo para aplicar.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Aplicando…';
+            try {
+                const ids = [...seleccionados];
+                // Productos que pasan a "vendido" ahora (para registrarlos en ventas)
+                const nuevosVendidos = estado === 'vendido'
+                    ? inventarioGlobal.filter(p => seleccionados.has(String(p.id)) && p.status !== 'vendido')
+                    : [];
+
+                const { error } = await supabaseClient.from('products').update(cambios).in('id', ids);
+                if (error) throw error;
+
+                if (nuevosVendidos.length > 0) {
+                    await supabaseClient.from('sales').insert(nuevosVendidos.map(p => ({
+                        product_id: p.id,
+                        sale_price: cambios.price ?? p.price,
+                        status: 'completada',
+                        observations: 'Marcado como vendido desde edición en masa'
+                    })));
+                }
+
+                cerrarModalMasivo();
+                seleccionados.clear();
+                await cargarInventarioAdmin();
+                cargarVentasAdmin();
+                cargarCatalogoPublico();
+            } catch (err) {
+                console.error(err);
+                alert('No se pudieron aplicar los cambios: ' + (err.message || err));
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Aplicar cambios';
+            }
+        }
+
+        /* ---------- Acciones individuales ---------- */
         async function marcarComoVendido(id) {
+            const p = inventarioGlobal.find(x => String(x.id) === String(id));
             const { error } = await supabaseClient.from('products').update({ status: 'vendido' }).eq('id', id);
             if (error) { alert('No se pudo actualizar el estado: ' + error.message); return; }
             await supabaseClient.from('sales').insert([{
                 product_id: id,
-                sale_price: 0,
+                sale_price: p ? p.price : 0,
                 status: 'completada',
                 observations: 'Marcado como vendido desde acción rápida'
             }]);
@@ -436,11 +679,11 @@
                 return;
             }
             tbody.innerHTML = data.map(v => `
-                <tr class="hover:bg-stone-50">
+                <tr class="hover:bg-cream-100">
                     <td class="p-4 text-stone-600">${new Date(v.created_at).toLocaleDateString()}</td>
                     <td class="p-4 font-medium">${esc(v.products?.name || 'Pieza eliminada')}</td>
-                    <td class="p-4 font-medium">$ ${Number(v.sale_price).toFixed(2)}</td>
-                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-md bg-stone-100 text-stone-600">${esc(v.status)}</span></td>
+                    <td class="p-4 font-medium">${soles(v.sale_price)}</td>
+                    <td class="p-4"><span class="text-xs font-medium px-2.5 py-1 rounded-md bg-cream-200 text-stone-700">${esc(v.status)}</span></td>
                 </tr>
             `).join('');
         }
@@ -459,8 +702,6 @@
             $('modal-producto').classList.remove('flex');
         }
 
-        // GUARDADO: ahora todo va dentro de try/catch/finally, así el botón
-        // nunca se queda trabado aunque algo falle.
         async function guardarProducto(e) {
             e.preventDefault();
             const btn = $('btn-guardar-prod');
@@ -478,7 +719,6 @@
                     status: $('prod-estado').value
                 };
 
-                // Subida de fotos, una por una
                 const files = $('prod-fotos').files;
                 const imageUrls = [];
                 const fallos = [];
@@ -507,7 +747,6 @@
                 const res = id
                     ? await supabaseClient.from('products').update(productoData).eq('id', id)
                     : await supabaseClient.from('products').insert([productoData]);
-
                 if (res.error) throw res.error;
 
                 cerrarModalProducto();
@@ -546,6 +785,7 @@
             if (!confirm('¿Eliminar este producto del inventario?')) return;
             const { error } = await supabaseClient.from('products').delete().eq('id', id);
             if (error) { alert('No se pudo eliminar: ' + error.message); return; }
+            seleccionados.delete(String(id));
             cargarInventarioAdmin();
             cargarCatalogoPublico();
         }
