@@ -39,7 +39,9 @@
             --dot: 70 65 60; --dot-a: .16;
             --shadow: 0 1px 2px rgb(20 20 25 / .05), 0 10px 30px rgb(20 20 25 / .08);
             --shadow-lift: 0 2px 4px rgb(20 20 25 / .06), 0 18px 40px rgb(20 20 25 / .14);
-            --hero-img: url('hero-image.png');
+            --hero-img: url('https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/hero-image.png'), url('hero-image.png');
+            --gap-card: 5px;      /* margen entre la foto y el borde de la tarjeta */
+            --gap-content: 5px;   /* margen lateral/inferior del texto, precio y botón */
         }
         .dark {
             --bg: 20 20 22; --surface: 31 31 35; --soft: 42 42 47; --footer: 36 36 41;
@@ -65,18 +67,17 @@
 
         /* ===== Hero ===== */
         #hero {
-            position: relative; overflow: hidden; margin: 10px; border-radius: 30px;
+            position: relative; overflow: hidden; margin: 10px; border-radius: 30px; min-height: 640px;
             background-color: #2f3337;
             background-image: var(--hero-img), linear-gradient(135deg, #59606b, #23272d);
             background-size: cover; background-position: center;
             box-shadow: var(--shadow);
         }
-        .hero-text-box {
-            background: rgb(255 255 255 / .13);
-            -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-            border-radius: 30px; box-shadow: 0 10px 40px rgb(0 0 0 / .22);
-        }
-        .hero-text { color: #fff; text-shadow: 0 2px 14px rgb(0 0 0 / .4); }
+                .hero-text { color: #fff; text-shadow: 0 2px 14px rgb(0 0 0 / .4); }
+        /* La portada ocupa todo el ancho (solo 10px de margen). En escritorio mantiene proporción 16:9 */
+        @media (min-width: 640px) { #hero { min-height: 560px; } }
+        @media (min-width: 1024px) { #hero { height: min(56.25vw, calc(100svh - 20px)); min-height: 520px; } }
+        .hidden { display: none !important; }
         .logo-pill {
             display: inline-flex; align-items: center; padding: .55rem 1.4rem; border-radius: 9999px;
             background: rgb(250 250 249 / .92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
@@ -117,9 +118,11 @@
         .btn-primary { background: rgb(var(--ink)); color: rgb(var(--surface)); }
         .btn-secondary { background: rgb(var(--soft)); color: rgb(var(--ink)); }
         .btn-danger { background: rgb(var(--red) / .12); color: rgb(var(--red-text)); }
+        .btn-quiet { background: rgb(var(--ink) / .07); color: rgb(var(--ink)); }
         .btn-primary:not(:disabled):hover { background: rgb(var(--ink) / .85); }
         .btn-secondary:not(:disabled):hover { background: rgb(var(--soft) / .7); }
         .btn-danger:not(:disabled):hover { background: rgb(var(--red) / .2); }
+        .btn-quiet:not(:disabled):hover { background: rgb(var(--ink) / .88); color: rgb(var(--surface)); }
         .btn:not(:disabled):hover, .icon-btn:hover, .fab:hover {
             -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 6px 18px rgb(20 20 25 / .16);
         }
@@ -152,20 +155,16 @@
 <body class="min-h-screen">
 
     <!-- ================= HERO (solo en el catálogo) ================= -->
-    <section id="hero" class="flex flex-col justify-between gap-8 p-5 sm:p-8 min-h-[640px] sm:min-h-[560px] lg:min-h-0 lg:aspect-video lg:max-h-[calc(100svh-20px)]">
+    <section id="hero" class="flex flex-col gap-8 p-5 sm:p-8">
         <div class="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55 pointer-events-none"></div>
 
-        <!-- Logo en caja de lados redondeados -->
-        <div class="relative self-center sm:self-start rise">
-            <a href="#" onclick="cambiarVista('catalogo'); return false;" class="logo-pill" aria-label="creatiyés">
-                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-9 sm:h-11 object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
+        <!-- Logo y título al centro (sin caja) -->
+        <div class="relative flex flex-col items-center text-center gap-6 my-auto w-full max-w-4xl mx-auto">
+            <a href="#" onclick="cambiarVista('catalogo'); return false;" class="logo-pill rise" aria-label="creatiyés">
+                <img src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes.png" alt="creatiyés" class="h-9 sm:h-11 object-contain" style="transform: scale(.8)" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=200&q=80';">
             </a>
-        </div>
-
-        <!-- Título al centro -->
-        <div class="relative flex justify-center my-auto">
-            <div class="hero-text-box rise max-w-3xl w-full text-center px-6 py-8 sm:px-12 sm:py-12" style="animation-delay: .12s">
-                <h1 class="hero-text font-title text-[2rem] leading-[1.1] sm:text-5xl lg:text-[3.4rem]">Querido Santa, haz que toda la tienda se venda como panetón y chocolate</h1>
+            <div class="rise" style="animation-delay: .12s">
+                <h1 class="hero-text font-title text-[2rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]">Querido Santa, haz que toda la tienda se venda como panetón y chocolate</h1>
                 <p class="hero-text mt-4 text-base sm:text-lg font-medium opacity-95">(Ponle magia a tus ambientes)</p>
             </div>
         </div>
@@ -175,7 +174,7 @@
     </section>
 
     <!-- ================= CONTENIDO ================= -->
-    <main class="max-w-[1240px] mx-auto px-5">
+    <main class="max-w-[1320px] mx-auto px-5">
 
         <!-- CATÁLOGO PÚBLICO -->
         <section id="vista-catalogo" class="pt-12 fade-in">
@@ -269,11 +268,11 @@
     </main>
 
     <!-- ================= FOOTER ================= -->
-    <footer class="max-w-[1240px] mx-auto px-5 pt-16 pb-24">
+    <footer class="max-w-[1320px] mx-auto px-5 pt-16 pb-24">
         <div class="bg-footer rounded-[30px] shadow-soft p-8 sm:p-10 space-y-8">
             <!-- Logo + crédito -->
             <div class="flex flex-col items-center gap-6 md:flex-row md:justify-between">
-                <img id="logo-mono" src="logo_creatiyes-mono.png" alt="creatiyés" class="h-10 sm:h-12 object-contain">
+                <img id="logo-mono" src="https://mprojuxphdxyvghqoynv.supabase.co/storage/v1/object/public/productos/logo_creatiyes-mono.png" alt="creatiyés" class="h-10 sm:h-12 object-contain" onerror="this.onerror=null; this.src='logo_creatiyes-mono.png';">
                 <a href="https://linktr.ee/mau.mibranda" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-2.5 text-sm text-muted hover:text-ink transition-colors">
                     <span data-icon="linktree" data-cls="w-[18px] h-[18px] transition-transform duration-300 group-hover:-rotate-12 group-hover:text-accent"></span>
                     <span>Desarrollado por <strong class="font-semibold text-ink">Mauricio Miranda</strong></span>
@@ -408,11 +407,18 @@
         </div>
     </div>
 
-    <!-- Zoom de imagen -->
-    <div id="modal-zoom" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="cerrarZoom()">
-        <button onclick="cerrarZoom()" aria-label="Cerrar imagen" class="icon-btn fixed top-4 right-4 w-11 h-11"><span data-icon="x" data-cls="w-5 h-5"></span></button>
-        <img id="img-zoom-src" src="" alt="" class="max-w-full max-h-[80vh] rounded-[22px] object-contain" onclick="event.stopPropagation()">
-        <p class="fixed bottom-6 inset-x-0 text-center text-sm text-white/80">Presiona Esc o toca afuera para cerrar</p>
+    <!-- Galería ampliada -->
+    <div id="modal-zoom" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden flex-col items-center justify-center gap-4 z-50 p-4" onclick="clickFondoZoom(event)" role="dialog" aria-modal="true" aria-label="Galería de fotos">
+        <div id="zoom-visor" class="relative overflow-hidden rounded-[25px]" style="width: min(94vw, 1100px); height: calc(100svh - 210px); max-height: 760px;">
+            <div id="zoom-track" class="track flex h-full transition-transform duration-500 ease-out"></div>
+            <button id="zoom-prev" data-zoom-keep onclick="moverZoom(-1)" aria-label="Foto anterior" class="icon-btn absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11"><span data-icon="left" data-cls="w-5 h-5"></span></button>
+            <button id="zoom-next" data-zoom-keep onclick="moverZoom(1)" aria-label="Foto siguiente" class="icon-btn absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11"><span data-icon="right" data-cls="w-5 h-5"></span></button>
+        </div>
+        <div class="flex flex-col items-center gap-3">
+            <span id="zoom-contador" data-zoom-keep class="badge bg-surface text-ink shadow-soft"></span>
+            <button data-zoom-keep onclick="cerrarZoom()" aria-label="Cerrar galería" class="icon-btn w-11 h-11"><span data-icon="x" data-cls="w-5 h-5"></span></button>
+            <p class="text-xs sm:text-sm text-white/80 text-center">Presiona Esc o toca afuera para cerrar · ← → para cambiar de foto</p>
+        </div>
     </div>
 
     <script>
@@ -489,12 +495,17 @@
             cargarCatalogoPublico();
             configurarEventosCatalogo();
             configurarEventosCategorias();
+            configurarZoom();
             configurarEventosEditorFotos();
             if (document.fonts && document.fonts.ready) document.fonts.ready.then(lineaEnSeleccion);
             window.addEventListener('resize', lineaEnSeleccion);
         });
 
         document.addEventListener('keydown', (e) => {
+            if (zoomAbierto()) {
+                if (e.key === 'ArrowLeft') moverZoom(-1);
+                else if (e.key === 'ArrowRight') moverZoom(1);
+            }
             if (e.key !== 'Escape') return;
             cerrarZoom();
             cerrarModalProducto();
@@ -642,19 +653,19 @@
                 const slides = fotos.map(f => `<img src="${esc(f)}" alt="${esc(p.name)}" data-zoom="${esc(f)}" draggable="false" class="w-full h-full flex-none object-cover cursor-zoom-in">`).join('');
 
                 return `
-                    <article class="flex flex-col bg-surface rounded-[30px] p-3 shadow-soft transition duration-300 hover:-translate-y-0.5" onmouseenter="this.style.boxShadow='var(--shadow-lift)'" onmouseleave="this.style.boxShadow=''">
-                        <div class="relative aspect-square overflow-hidden rounded-[22px] bg-soft select-none" data-carrusel="${esc(p.id)}">
+                    <article class="flex flex-col bg-surface rounded-[30px] shadow-soft transition duration-300 hover:-translate-y-0.5" style="padding: var(--gap-card)" onmouseenter="this.style.boxShadow='var(--shadow-lift)'" onmouseleave="this.style.boxShadow=''">
+                        <div class="relative aspect-square overflow-hidden rounded-[25px] bg-soft select-none" data-carrusel="${esc(p.id)}">
                             <div id="track-${esc(p.id)}" class="track flex h-full transition-transform duration-500 ease-out" style="transform: translateX(-${idx * 100}%)">${slides}</div>
                             ${badge}
                             ${controles}
                         </div>
-                        <div class="flex flex-col gap-1.5 flex-1 px-3 pt-5 pb-3">
+                        <div class="flex flex-col gap-1.5 flex-1 pt-4" style="padding-left: var(--gap-content); padding-right: var(--gap-content); padding-bottom: var(--gap-content)">
                             <p class="text-xs font-semibold uppercase tracking-wider text-accent">${esc(p.category || 'General')}</p>
                             <h3 class="font-title text-2xl">${esc(p.name)}</h3>
                             <p class="text-sm text-muted leading-relaxed line-clamp-2">${esc(p.description || 'Pieza artesanal única elaborada a mano.')}</p>
-                            <div class="flex items-center justify-between gap-3 pt-5 mt-auto">
+                            <div class="flex items-center justify-between gap-3 pt-4 mt-auto">
                                 <span class="text-xl font-bold">${soles(p.price)}</span>
-                                <button data-quiero="${esc(p.id)}" class="btn btn-primary">${icon('chat', 'w-4 h-4')}Quiero este</button>
+                                <button data-quiero="${esc(p.id)}" class="btn btn-quiet">${icon('chat', 'w-4 h-4')}Quiero este</button>
                             </div>
                         </div>
                     </article>`;
@@ -674,7 +685,11 @@
                 else if (quiero) {
                     const p = productosGlobal.find(x => String(x.id) === quiero.dataset.quiero);
                     if (p) accionQuieroEste(p);
-                } else if (zoom) abrirZoom(zoom.dataset.zoom);
+                } else if (zoom) {
+                    const card = zoom.closest('[data-carrusel]');
+                    const p = card && productosGlobal.find(x => String(x.id) === card.dataset.carrusel);
+                    if (p) abrirZoom(fotosDe(p), carruselIndices[p.id] || 0, p.id);
+                }
             });
 
             // Deslizar con el dedo en el celular
@@ -693,6 +708,18 @@
             }, { passive: true });
         }
 
+        function irACarrusel(idProd, i) {
+            const p = productosGlobal.find(x => String(x.id) === String(idProd));
+            if (!p) return;
+            const total = fotosDe(p).length;
+            i = Math.max(0, Math.min(i, total - 1));
+            carruselIndices[p.id] = i;
+            const track = $(`track-${p.id}`);
+            if (track) track.style.transform = `translateX(-${i * 100}%)`;
+            const cnt = $(`cnt-${p.id}`);
+            if (cnt) cnt.textContent = `${i + 1}/${total}`;
+        }
+
         function moverCarrusel(idProd, direccion) {
             const p = productosGlobal.find(x => String(x.id) === String(idProd));
             if (!p) return;
@@ -701,21 +728,64 @@
             let i = (carruselIndices[p.id] || 0) + direccion;
             if (i < 0) i = total - 1;
             if (i >= total) i = 0;
-            carruselIndices[p.id] = i;
-            const track = $(`track-${p.id}`);
-            if (track) track.style.transform = `translateX(-${i * 100}%)`;
-            const cnt = $(`cnt-${p.id}`);
-            if (cnt) cnt.textContent = `${i + 1}/${total}`;
+            irACarrusel(p.id, i);
         }
 
-        function abrirZoom(url) {
-            $('img-zoom-src').src = url;
+        /* ---------- Galería ampliada (carrusel dentro de la vista expandida) ---------- */
+        let zoomFotos = [], zoomIdx = 0, zoomProdId = null;
+        const zoomAbierto = () => !$('modal-zoom').classList.contains('hidden');
+
+        function posicionarZoom(animar) {
+            const track = $('zoom-track');
+            if (!animar) track.style.transition = 'none';
+            track.style.transform = `translateX(-${zoomIdx * 100}%)`;
+            if (!animar) { void track.offsetWidth; track.style.transition = ''; }
+            $('zoom-contador').textContent = `${zoomIdx + 1} / ${zoomFotos.length}`;
+        }
+
+        function abrirZoom(fotos, idx = 0, idProd = null) {
+            zoomFotos = fotos; zoomIdx = idx; zoomProdId = idProd;
+            $('zoom-track').innerHTML = fotos.map(f => `
+                <div class="w-full h-full flex-none flex items-center justify-center">
+                    <img src="${esc(f)}" alt="" draggable="false" data-zoom-keep class="max-w-full max-h-full object-contain rounded-[20px] select-none">
+                </div>`).join('');
+            const varias = fotos.length > 1;
+            ['zoom-prev', 'zoom-next', 'zoom-contador'].forEach(id => { $(id).style.display = varias ? '' : 'none'; });
+            posicionarZoom(false);
             $('modal-zoom').classList.remove('hidden');
             $('modal-zoom').classList.add('flex');
         }
+
+        function moverZoom(d) {
+            const n = zoomFotos.length;
+            if (n < 2) return;
+            zoomIdx = (zoomIdx + d + n) % n;
+            posicionarZoom(true);
+        }
+
         function cerrarZoom() {
+            if (!zoomAbierto()) return;
             $('modal-zoom').classList.add('hidden');
             $('modal-zoom').classList.remove('flex');
+            if (zoomProdId !== null) irACarrusel(zoomProdId, zoomIdx); // la tarjeta queda en la foto que viste
+            zoomProdId = null;
+        }
+
+        function clickFondoZoom(e) {
+            if (e.target.closest('[data-zoom-keep]')) return;
+            cerrarZoom();
+        }
+
+        function configurarZoom() {
+            const visor = $('zoom-visor');
+            let x0 = null;
+            visor.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+            visor.addEventListener('touchend', (e) => {
+                if (x0 === null) return;
+                const dx = e.changedTouches[0].clientX - x0;
+                if (Math.abs(dx) > 40) moverZoom(dx < 0 ? 1 : -1);
+                x0 = null;
+            }, { passive: true });
         }
 
         function accionQuieroEste(p) {
